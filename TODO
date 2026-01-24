@@ -1,0 +1,10 @@
+// TODO: ottimizzazione futura
+// - usare 1 texture per chunk invece di tanti sprite singoli
+// - usare batching automatico PixiJS (raggruppare)
+// - aggiornare solo celle "dirty" invece di ridisegnare tutto
+- usare sprite al posto di graphics in realta leggo su documentaizone:
+Small Graphics objects are as fast as Sprites (rectangles, triangles)
+quindi se piccole forme non dovrebbero esserci problemi
+
+
+- oppure usare TilingSprite

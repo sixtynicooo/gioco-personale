@@ -1,35 +1,44 @@
-import { Application, Assets, Sprite } from "pixi.js";
+import { Application, Renderer } from 'pixi.js';
+
+import { World } from './scenes/map/world';
+import { Camera } from './scenes/map/camera/camera';
 
 (async () => {
-  // Create a new application
-  const app = new Application();
+  // prima o poi si dovrà utilizzare chunk
+  const distanzaWidthHeight = 20;
+  const righeColonne = 100;
 
+  // Create a new application
+  const app: Application<Renderer> = new Application();
+
+  (globalThis as any).__PIXI_APP__ = app;
   // Initialize the application
-  await app.init({ background: "#10bb3b", resizeTo: window });
+  await app.init({
+    width: distanzaWidthHeight * righeColonne,
+    height: distanzaWidthHeight * righeColonne,
+  });
+  //await app.init({ background: '#10bb3b', resizeTo: window });
 
   // Append the application canvas to the document body
-  document.getElementById("pixi-container")!.appendChild(app.canvas);
+  const pixiContainer = document.getElementById('pixi-container');
+  if (pixiContainer) {
+    pixiContainer.appendChild(app.canvas);
+    // const matrix: Matrix = new Matrix(distanzaXY, RigheColonne, world);
+    // console.log(matrix);
+    const world = new World(distanzaWidthHeight, righeColonne, app);
+    const worldTmp = world.getWorld();
+    const cameraInstance = new Camera(
+      app,
+      distanzaWidthHeight,
+      righeColonne,
+      world,
+    ).getViewport();
 
-  // Load the bunny texture
-  const texture = await Assets.load("/assets/bunny.png");
+    ///////////////////////
+    ///////////////////
 
-  // Create a bunny Sprite
-  const bunny = new Sprite(texture);
-
-  // Center the sprite's anchor point
-  bunny.anchor.set(0.5);
-
-  // Move the sprite to the center of the screen
-  bunny.position.set(app.screen.width / 2, app.screen.height / 2);
-
-  // Add the bunny to the stage
-  app.stage.addChild(bunny);
-
-  // Listen for animate update
-  app.ticker.add((time) => {
-    // Just for fun, let's rotate mr rabbit a little.
-    // * Delta is 1 if running at 100% performance *
-    // * Creates frame-independent transformation *
-    bunny.rotation += 0.1 * time.deltaTime;
-  });
+    // app.ticker.add((time) => {
+    //   console.log(time);
+    // });
+  }
 })();
