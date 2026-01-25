@@ -1,5 +1,47 @@
 import { Graphics, Sprite, Texture } from 'pixi.js';
 
+export const createBorderGraphic = (
+  i: number,
+  j: number,
+  distanzaWidthHeight: number,
+  borderColor: string,
+  zIndex: number,
+  top: boolean,
+  right: boolean,
+  bottom: boolean,
+  left: boolean,
+): Graphics => {
+  const x = j * distanzaWidthHeight;
+  const y = i * distanzaWidthHeight;
+  const s = distanzaWidthHeight;
+
+  const border = new Graphics();
+
+  if (top) {
+    border.moveTo(x, y).lineTo(x + s, y);
+  }
+
+  if (right) {
+    border.moveTo(x + s, y).lineTo(x + s, y + s);
+  }
+
+  if (bottom) {
+    border.moveTo(x + s, y + s).lineTo(x, y + s);
+  }
+
+  if (left) {
+    border.moveTo(x, y + s).lineTo(x, y);
+  }
+
+  border.stroke({
+    color: borderColor,
+    width: 1,
+  });
+
+  border.zIndex = zIndex;
+  return border;
+};
+
 // usato per cambiare colori e altro, riutilizzo Graphics senza ricrearlo
 export const creazioneRettangoloReuseGraph = (
   bg: string,
