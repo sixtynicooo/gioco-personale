@@ -6,7 +6,7 @@ import { Camera } from './scenes/map/camera/camera';
 (async () => {
   // prima o poi si dovrà utilizzare chunk
   const distanzaWidthHeight = 20;
-  const righeColonne = 100;
+  const righeColonne = 10;
 
   // Create a new application
   const app: Application<Renderer> = new Application();
@@ -33,6 +33,7 @@ import { Camera } from './scenes/map/camera/camera';
       righeColonne,
       world,
     ).getViewport();
+    world.addEventClickWord(cameraInstance);
 
     ///////////////////////
     ///////////////////

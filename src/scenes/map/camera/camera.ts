@@ -1,18 +1,10 @@
 import { Viewport } from 'pixi-viewport';
-import {
-  Application,
-  Container,
-  ContainerChild,
-  FederatedPointerEvent,
-  Renderer,
-} from 'pixi.js';
-import { Matrix } from '../matrixMap';
+import { Application, Renderer } from 'pixi.js';
 import { World } from '../world';
 
 // https://viewport.pixijs.io/ e https://github.com/pixijs-userland/pixi-viewport
 export class Camera {
   private viewport: Viewport;
-  private matrix: Matrix;
 
   constructor(
     private app: Application<Renderer>,
@@ -38,23 +30,10 @@ export class Camera {
     // aggiungiamo il viewport al stage principale
     this.viewport.addChild(worldTmp.getWorld());
     app.stage.addChild(this.viewport);
-
-    this.matrix = worldTmp.getMatrix();
-    this.addEventClickWord(worldTmp.getWorld());
   }
 
   public getViewport() {
     return this.viewport;
-  }
-
-  // aggiungo evento che trasforma le coordinate
-  private addEventClickWord(worldTmp: Container<ContainerChild>) {
-    worldTmp.on('click', (e: FederatedPointerEvent) => {
-      const wordPosition = this.viewport.toWorld(e.screenX, e.screen.y);
-      const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
-      const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
-      this.matrix.setMatrixCelleColor(riga, colonna, 'blue');
-    });
   }
 }
 
