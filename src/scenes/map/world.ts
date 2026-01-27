@@ -5,24 +5,33 @@ import {
   FederatedPointerEvent,
   Renderer,
 } from 'pixi.js';
-import { Chunk } from './griglia/chunk';
 import { Viewport } from 'pixi-viewport';
+import { MapMatrix } from './griglia/chunkMatrix';
 
 export class World {
   private world: Container<ContainerChild>;
-  private matrixChunk: Chunk;
+  private matrixChunk: MapMatrix;
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
+    private nchunkRow: number,
+    private nchunkCol: number,
     private app: Application<Renderer>,
   ) {
     this.world = new Container({
-      width: distanzaWidthHeight * RigheColonne,
-      height: distanzaWidthHeight * RigheColonne,
+      width: distanzaWidthHeight * RigheColonne * nchunkCol,
+      height: distanzaWidthHeight * RigheColonne * nchunkRow,
     });
 
     // creazione mappa chunk
-    this.matrixChunk = new Chunk(distanzaWidthHeight, RigheColonne, this.world);
+    //this.matrixChunk = new Chunk(distanzaWidthHeight, RigheColonne, this.world);
+    this.matrixChunk = new MapMatrix(
+      distanzaWidthHeight,
+      RigheColonne,
+      nchunkRow,
+      nchunkCol,
+      this.world,
+    );
 
     // Center bunny sprite in local container coordinates
     this.world.pivot.x = this.world.width / 2;
@@ -44,6 +53,13 @@ export class World {
       const wordPosition = cameraInstance.toWorld(e.screenX, e.screen.y);
       const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
       const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
+      // console.log(
+      //   wordPosition,
+      //   riga,
+      //   colonna,
+      //   this.matrixChunk.getChunkRowCol(riga, colonna),
+      // );
+      //console.log(this.matrixChunk.getChunkRowCol(riga, colonna));
       this.matrixChunk.setMatrixCelleColor(riga, colonna, 'red');
     });
   }

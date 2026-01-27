@@ -6,7 +6,9 @@ import { Camera } from './scenes/map/camera/camera';
 (async () => {
   // prima o poi si dovrà utilizzare chunk
   const distanzaWidthHeight = 20;
-  const righeColonne = 10;
+  const nCell = 5;
+  const nchunkRow = 2;
+  const nchunkCol = nchunkRow;
 
   // Create a new application
   const app: Application<Renderer> = new Application();
@@ -14,8 +16,8 @@ import { Camera } from './scenes/map/camera/camera';
   (globalThis as any).__PIXI_APP__ = app;
   // Initialize the application
   await app.init({
-    width: distanzaWidthHeight * righeColonne,
-    height: distanzaWidthHeight * righeColonne,
+    width: distanzaWidthHeight * nCell * nchunkCol,
+    height: distanzaWidthHeight * nCell * nchunkRow,
   });
   //await app.init({ background: '#10bb3b', resizeTo: window });
 
@@ -25,12 +27,17 @@ import { Camera } from './scenes/map/camera/camera';
     pixiContainer.appendChild(app.canvas);
     // const matrix: Matrix = new Matrix(distanzaXY, RigheColonne, world);
     // console.log(matrix);
-    const world = new World(distanzaWidthHeight, righeColonne, app);
-    const worldTmp = world.getWorld();
+    const world = new World(
+      distanzaWidthHeight,
+      nCell,
+      nchunkRow,
+      nchunkCol,
+      app,
+    );
     const cameraInstance = new Camera(
       app,
       distanzaWidthHeight,
-      righeColonne,
+      nCell,
       world,
     ).getViewport();
     world.addEventClickWord(cameraInstance);

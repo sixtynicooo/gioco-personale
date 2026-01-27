@@ -1,8 +1,8 @@
 import { Graphics, Sprite, Texture } from 'pixi.js';
 
 export const createBorderGraphic = (
-  i: number,
-  j: number,
+  riga: number,
+  colonna: number,
   distanzaWidthHeight: number,
   borderColor: string,
   zIndex: number,
@@ -11,8 +11,8 @@ export const createBorderGraphic = (
   bottom: boolean,
   left: boolean,
 ): Graphics => {
-  const x = j * distanzaWidthHeight;
-  const y = i * distanzaWidthHeight;
+  const x = colonna * distanzaWidthHeight;
+  const y = riga * distanzaWidthHeight;
   const s = distanzaWidthHeight;
 
   const border = new Graphics();
@@ -54,16 +54,16 @@ export const creazioneRettangoloReuseGraph = (
 };
 
 export const createColorSprite = (
-  i: number,
-  j: number,
+  riga: number,
+  colonna: number,
   distanzaWidthHeight: number,
   color: string,
   alpha: number,
   zIndex: number,
 ) => {
   const rect = new Sprite(Texture.WHITE);
-  rect.x = j * distanzaWidthHeight;
-  rect.y = i * distanzaWidthHeight;
+  rect.x = colonna * distanzaWidthHeight;
+  rect.y = riga * distanzaWidthHeight;
   rect.width = distanzaWidthHeight;
   rect.height = distanzaWidthHeight;
   rect.tint = color;
