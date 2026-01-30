@@ -1,13 +1,11 @@
-import { Application, Renderer } from 'pixi.js';
-
-import { World } from './scenes/map/world';
-import { Camera } from './scenes/map/camera/camera';
+import { Application, Renderer, Ticker } from 'pixi.js';
+import { GameMap } from './scenes/game';
 
 (async () => {
   // prima o poi si dovrà utilizzare chunk
-  const distanzaWidthHeight = 20;
-  const nCell = 5;
-  const nchunkRow = 2;
+  const distanzaWidthHeight = 10;
+  const RigheColonne = 10;
+  const nchunkRow = 10;
   const nchunkCol = nchunkRow;
 
   // Create a new application
@@ -16,8 +14,8 @@ import { Camera } from './scenes/map/camera/camera';
   (globalThis as any).__PIXI_APP__ = app;
   // Initialize the application
   await app.init({
-    width: distanzaWidthHeight * nCell * nchunkCol,
-    height: distanzaWidthHeight * nCell * nchunkRow,
+    width: distanzaWidthHeight * RigheColonne * nchunkCol,
+    height: distanzaWidthHeight * RigheColonne * nchunkRow,
   });
   //await app.init({ background: '#10bb3b', resizeTo: window });
 
@@ -25,22 +23,23 @@ import { Camera } from './scenes/map/camera/camera';
   const pixiContainer = document.getElementById('pixi-container');
   if (pixiContainer) {
     pixiContainer.appendChild(app.canvas);
+    const ticker = new Ticker();
+    ticker.minFPS = 30;
     // const matrix: Matrix = new Matrix(distanzaXY, RigheColonne, world);
     // console.log(matrix);
-    const world = new World(
+    const game = new GameMap(
       distanzaWidthHeight,
-      nCell,
+      RigheColonne,
       nchunkRow,
       nchunkCol,
       app,
     );
-    const cameraInstance = new Camera(
-      app,
-      distanzaWidthHeight,
-      nCell,
-      world,
-    ).getViewport();
-    world.addEventClickWord(cameraInstance);
+
+    ticker.add((ticker) => {
+      // logica gioco
+      console.log(`Delta Time: ${ticker.deltaTime}`);
+    });
+    ticker.start();
 
     ///////////////////////
     ///////////////////

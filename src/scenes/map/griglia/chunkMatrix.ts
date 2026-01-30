@@ -80,7 +80,7 @@ export class MapMatrix {
           world.addChild(rect);
         }
         if (this.border[i][j]) {
-          world.addChild(borderTmp);
+          // world.addChild(borderTmp);
         }
       }
     }
