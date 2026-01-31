@@ -54,6 +54,7 @@ export class Chunk {
           nchunkCol,
           RigheColonne,
           'green',
+          false,
           1,
           true,
           true,
@@ -118,6 +119,23 @@ export class Chunk {
         );
       }
     }
+
+    this.owner[this.RigheColonne * this.nchunkRow][
+      this.RigheColonne * this.nchunkCol
+    ] = 10;
+    this.owner[this.RigheColonne * this.nchunkRow + 1][
+      this.RigheColonne * this.nchunkCol + 2
+    ] = 10;
+    this.owner[this.RigheColonne * this.nchunkRow + 2][
+      this.RigheColonne * this.nchunkCol + 2
+    ] = 10;
+    // console.log(
+    //   this.owner[this.RigheColonne * this.nchunkRow][
+    //     this.RigheColonne * this.nchunkCol + 1
+    //   ],
+    // );
+    // console.log(this.optimizaAllChunk());
+
     if (this.optimizaAllChunk()) {
       reuseColorSprite(
         this.distanzaWidthHeight * this.RigheColonne,
@@ -127,8 +145,154 @@ export class Chunk {
         this.matrixChunk[0][0].colorPlayer,
       );
       console.log(this.matrixChunk[0][0]);
+    } else {
+      this.optimizeLineAllNumber(bg);
     }
 
     //creazioneRettangoloReuseSprite(bg, this.matrixChunk[riga][colonna]);
   }
+
+  // cerco di capire quanti rettangoli si possono usare per ogni riga (ho visto che è rispecchiato con colonne quindi non ha senso fare 2 calcoli)
+  private optimizeLineAllNumber(bg: string) {
+    const rowGlobal = this.RigheColonne * this.nchunkRow;
+    const colGlobal = this.RigheColonne * this.nchunkCol;
+    for (let row = 0; row < this.RigheColonne; row++) {
+      this.optimizeRowNumber(rowGlobal, colGlobal, row, bg);
+    }
+  }
+  // private optimizeRowNumber(
+  //   rowGlobal: number,
+  //   colGlobal: number,
+  //   row: number,
+  //   bg: string,
+  // ) {
+  //   let rectStart = 0;
+  //   let lastOwner = this.owner[rowGlobal + row][colGlobal];
+  //   for (let col = 0; col < this.RigheColonne; col++) {
+  //     const current = this.owner[rowGlobal + row][colGlobal + col];
+  //     if (current !== lastOwner || col === this.RigheColonne - 1) {
+  //       // Calcolo larghezza in pixel
+  //       const width =
+  //         (col - rectStart + (col === this.RigheColonne - 1 ? 1 : 0)) *
+  //         this.distanzaWidthHeight;
+
+  //       // Riciclo o creo sprite
+  //       console.log(
+  //         rectStart,
+  //         rowGlobal,
+  //         colGlobal,
+  //         this.matrixChunk,
+  //         rowGlobal + row,
+  //         colGlobal + rectStart,
+  //         colGlobal + rectStart,
+  //       );
+  //       reuseColorSprite(
+  //         width,
+  //         this.distanzaWidthHeight,
+  //         true,
+  //         bg,
+  //         this.matrixChunk[rowGlobal + row][colGlobal + col].colorPlayer,
+  //       );
+  //       // Reset per il prossimo rettangolo
+  //       rectStart = col;
+  //       lastOwner = current;
+  //     }
+  //   }
+  // }
+
+  private optimizeRowNumber(
+    rowGlobal: number,
+    colGlobal: number,
+    row: number,
+    bg: string,
+  ) {
+    let lastOwner = this.owner[rowGlobal + row][colGlobal];
+    let current = this.owner[rowGlobal + row][colGlobal];
+    let colStart = 0;
+    let width = this.distanzaWidthHeight;
+    for (let col = 0; col < this.RigheColonne; col++) {
+      current = this.owner[rowGlobal + row][colGlobal + col];
+      if (current !== lastOwner) {
+        console.log(row, colStart, width, this.distanzaWidthHeight, true, bg);
+        // console.log(
+        //   rowGlobal + row,
+        //   row,
+        //   colGlobal + col,
+        //   col,
+        //   rects,
+        //   this.matrixChunk,
+        // );
+        reuseColorSprite(
+          width - this.distanzaWidthHeight,
+          this.distanzaWidthHeight,
+          true,
+          bg,
+          this.matrixChunk[row][colStart].colorPlayer,
+        );
+        width = this.distanzaWidthHeight;
+        colStart = col;
+        lastOwner = current;
+        console.log('fattoooo');
+      } else if (col === this.RigheColonne - 1) {
+        reuseColorSprite(
+          width,
+          this.distanzaWidthHeight,
+          true,
+          bg,
+          this.matrixChunk[row][colStart].colorPlayer,
+        );
+        console.log('fattoooo111');
+      }
+      width += this.distanzaWidthHeight;
+    }
+  }
+  // private optimizeRowNumber(
+  //   rowGlobal: number,
+  //   colGlobal: number,
+  //   row: number,
+  //   bg: string,
+  // ) {
+  //   let rects = 0;
+  //   let lastOwner = this.owner[rowGlobal + row][colGlobal];
+  //   let current = this.owner[rowGlobal + row][colGlobal];
+  //   let colStart = 0;
+  //   let width = this.distanzaWidthHeight;
+  //   for (let col = 0; col < this.RigheColonne; col++) {
+  //     current = this.owner[rowGlobal + row][colGlobal + col];
+  //     if (current !== lastOwner) {
+  //       width -= this.distanzaWidthHeight;
+  //       console.log(
+  //         rowGlobal + row,
+  //         row,
+  //         colGlobal + col,
+  //         col,
+  //         rects,
+  //         this.matrixChunk,
+  //       );
+  //       reuseColorSprite(
+  //         width,
+  //         this.distanzaWidthHeight,
+  //         true,
+  //         bg,
+  //         this.matrixChunk[row][col - 1].colorPlayer,
+  //       );
+  //       rects = 0; // nuovo rettangolo
+  //       width = this.distanzaWidthHeight;
+  //       colStart = col;
+  //       lastOwner = current;
+  //       console.log('fattoooo');
+  //     } else if (col === this.RigheColonne - 1) {
+  //       reuseColorSprite(
+  //         width,
+  //         this.distanzaWidthHeight,
+  //         true,
+  //         bg,
+  //         this.matrixChunk[row][colStart].colorPlayer,
+  //       );
+  //       console.log('fattoooo111');
+  //     }
+  //     rects++;
+  //     width = rects * this.distanzaWidthHeight;
+  //   }
+  // }
 }

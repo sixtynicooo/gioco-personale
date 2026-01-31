@@ -9,6 +9,7 @@ export const createBorderGraphic = (
   nchunkCol: number,
   RigheColonne: number,
   borderColor: string,
+  visible: boolean,
   zIndex: number,
   top: boolean,
   right: boolean,
@@ -44,7 +45,7 @@ export const createBorderGraphic = (
     color: borderColor,
     width: 1,
   });
-
+  border.visible = visible;
   border.zIndex = zIndex;
   return border;
 };

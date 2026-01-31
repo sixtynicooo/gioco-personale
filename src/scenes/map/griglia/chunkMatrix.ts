@@ -108,7 +108,7 @@ export class MapMatrix {
     const matrixRednder: Nullable<Chunk> | undefined = this.mapChunk.get(
       this.chunkid[rowChunk][colChunk],
     );
-    console.log(this.chunkid[rowChunk][colChunk]);
+    //console.log(this.chunkid[rowChunk][colChunk]);
     // console.log(
     //   this.chunkid[row][col],
     //   matrixRednder?.getmMtrixCelle(row, col),
@@ -121,11 +121,6 @@ export class MapMatrix {
   getChunkRowCol(rigaGlobale: number, colonnaGlobale: number) {
     const row = this.chunkRow[rigaGlobale][colonnaGlobale];
     const col = this.chunkCol[rigaGlobale][colonnaGlobale];
-    console.log(
-      this.chunkid[this.chunkRow[rigaGlobale][colonnaGlobale]][
-        this.chunkCol[rigaGlobale][colonnaGlobale]
-      ],
-    );
     return {
       row: row,
       col: col,

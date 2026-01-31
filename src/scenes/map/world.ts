@@ -21,6 +21,7 @@ export class World {
     this.world = new Container({
       width: distanzaWidthHeight * RigheColonne * nchunkCol,
       height: distanzaWidthHeight * RigheColonne * nchunkRow,
+      cullable: true,
     });
 
     // creazione mappa chunk
