@@ -4,14 +4,11 @@ import {
   createColorSprite,
   creazioneRettangoloReuseSprite,
 } from '../../../utility/create-rectangle';
+import { Nullable } from '../../../model-type/type-utility';
 
-type cellChunk = {
+export type cellChunk = {
   colorPlayer: Sprite;
-  border: Graphics;
-  //map: Sprite;
-  row: number;
-  col: number;
-  data: null;
+  border: Nullable<Graphics>;
 };
 
 export class Chunk {
@@ -19,6 +16,9 @@ export class Chunk {
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
+    private nchunkRow: number,
+    private nchunkCol: number,
+    private owner: number[][],
     private world: Container<ContainerChild>,
   ) {
     for (let i = 0; i < RigheColonne; i++) {
@@ -28,43 +28,49 @@ export class Chunk {
           i,
           j,
           distanzaWidthHeight,
+          nchunkRow,
+          nchunkCol,
+          RigheColonne,
           'blue',
           0.7,
           0,
         );
-        const border: Graphics = createBorderGraphic(
-          i,
-          j,
-          distanzaWidthHeight,
-          'green',
-          1,
-          true,
-          true,
-          true,
-          true,
-        );
+        const border: Nullable<Graphics> = null;
+        // const border: Graphics = createBorderGraphic(
+        //   i,
+        //   j,
+        //   distanzaWidthHeight,
+        //   nchunkRow,
+        //   nchunkCol,
+        //   RigheColonne,
+        //   'green',
+        //   1,
+        //   true,
+        //   true,
+        //   true,
+        //   true,
+        // );
 
         this.matrixChunk[i][j] = {
           colorPlayer: rect,
           border: border,
-          row: i,
-          col: j,
-          data: null,
         };
 
-        world.addChild(rect, border);
+        if (border) {
+          world.addChild(border);
+        }
+        if (rect) {
+          world.addChild(rect);
+        }
       }
     }
   }
 
-  getmMtrixCelle(colonna: number, riga: number) {
+  getmMtrixCelle(riga: number, colonna: number) {
     return this.matrixChunk[riga][colonna];
   }
 
   setMatrixCelleColor(riga: number, colonna: number, bg: string) {
-    creazioneRettangoloReuseSprite(
-      bg,
-      this.matrixChunk[riga][colonna].colorPlayer,
-    );
+    creazioneRettangoloReuseSprite(bg, this.matrixChunk[riga][colonna]);
   }
 }

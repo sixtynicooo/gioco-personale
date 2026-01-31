@@ -4,8 +4,8 @@ import { GameMap } from './scenes/game';
 (async () => {
   // prima o poi si dovrà utilizzare chunk
   const distanzaWidthHeight = 10;
-  const RigheColonne = 10;
-  const nchunkRow = 10;
+  const RigheColonne = 16;
+  const nchunkRow = 20;
   const nchunkCol = nchunkRow;
 
   // Create a new application
@@ -37,7 +37,8 @@ import { GameMap } from './scenes/game';
 
     ticker.add((ticker) => {
       // logica gioco
-      console.log(`Delta Time: ${ticker.deltaTime}`);
+      const a = ticker;
+      //console.log(`Delta Time: ${ticker.deltaTime}`);
     });
     ticker.start();
 

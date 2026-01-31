@@ -1,9 +1,13 @@
 import { Graphics, Sprite, Texture } from 'pixi.js';
+import { cellChunk } from '../scenes/map/griglia/chunk';
 
 export const createBorderGraphic = (
   riga: number,
   colonna: number,
   distanzaWidthHeight: number,
+  nchunkRow: number,
+  nchunkCol: number,
+  RigheColonne: number,
   borderColor: string,
   zIndex: number,
   top: boolean,
@@ -11,8 +15,11 @@ export const createBorderGraphic = (
   bottom: boolean,
   left: boolean,
 ): Graphics => {
-  const x = colonna * distanzaWidthHeight;
-  const y = riga * distanzaWidthHeight;
+  const x =
+    colonna * distanzaWidthHeight +
+    nchunkCol * RigheColonne * distanzaWidthHeight;
+  const y =
+    riga * distanzaWidthHeight + nchunkRow * RigheColonne * distanzaWidthHeight;
   const s = distanzaWidthHeight;
 
   const border = new Graphics();
@@ -57,13 +64,19 @@ export const createColorSprite = (
   riga: number,
   colonna: number,
   distanzaWidthHeight: number,
+  nchunkRow: number,
+  nchunkCol: number,
+  RigheColonne: number,
   color: string,
   alpha: number,
   zIndex: number,
 ) => {
   const rect = new Sprite(Texture.WHITE);
-  rect.x = colonna * distanzaWidthHeight;
-  rect.y = riga * distanzaWidthHeight;
+  rect.x =
+    colonna * distanzaWidthHeight +
+    nchunkCol * RigheColonne * distanzaWidthHeight;
+  rect.y =
+    riga * distanzaWidthHeight + nchunkRow * RigheColonne * distanzaWidthHeight;
   rect.width = distanzaWidthHeight;
   rect.height = distanzaWidthHeight;
   rect.tint = color;
@@ -72,7 +85,9 @@ export const createColorSprite = (
   return rect;
 };
 
-export const creazioneRettangoloReuseSprite = (bg: string, sprite: Sprite) => {
-  sprite.tint = bg;
-  return sprite;
+export const creazioneRettangoloReuseSprite = (
+  bg: string,
+  chunk: cellChunk,
+) => {
+  chunk.colorPlayer.tint = bg;
 };

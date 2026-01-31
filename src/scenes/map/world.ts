@@ -59,7 +59,9 @@ export class World {
       //   colonna,
       //   this.matrixChunk.getChunkRowCol(riga, colonna),
       // );
-      //console.log(this.matrixChunk.getChunkRowCol(riga, colonna));
+      console.log(wordPosition, riga, colonna);
+      // console.log(this.matrixChunk.getChunkRowCol(riga, colonna));
+
       this.matrixChunk.setMatrixCelleColor(riga, colonna, 'red');
     });
   }

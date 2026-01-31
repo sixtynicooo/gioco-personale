@@ -20,6 +20,21 @@ export class Camera {
       events: app.renderer.events,
     });
     // abilitiamo funzionalità interattive
+    // this.viewport
+    //   .drag()
+    //   .wheel({
+    //     percent: 0.05, // velocità dello zoom con rotellina
+    //     smooth: 3, // opzionale, rende lo zoom più fluido
+    //   })
+    //   .clampZoom({
+    //     minWidth: this.app.screen.width * 0.1, // non zoomare troppo fuori
+    //     minHeight: this.app.screen.height * 0.1,
+    //     maxWidth: worldTmp.getWorld().width, // massimo zoom: larghezza del mondo
+    //     maxHeight: worldTmp.getWorld().height, // altezza massima
+    //     // maxHeight: this.distanzaWidthHeight * this.RigheColonne, // altezza massima
+    //   })
+    //   .pinch({ percent: 1 });
+
     this.viewport
       .drag()
       .wheel({

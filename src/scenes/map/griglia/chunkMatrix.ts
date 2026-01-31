@@ -5,6 +5,7 @@ import {
   createColorSprite,
   creazioneRettangoloReuseSprite,
 } from '../../../utility/create-rectangle';
+import { Chunk } from './chunk';
 
 export class MapMatrix {
   // chi è il proprietario della cella
@@ -16,13 +17,15 @@ export class MapMatrix {
   // coordinata x del chunk
   private chunkCol: number[][] = [];
   // id chunk
-  private chunkid: number[][] = [];
+  private chunkid: string[][] = [];
+  // mappa rendering chunk, se non usato il campo sarà semplicemente null
+  private mapChunk = new Map<string, Nullable<Chunk>>();
 
   // rendering
   // colore della cella
-  private colorPlayer: Nullable<Sprite>[][] = [];
+  //private colorPlayer: Nullable<Sprite>[][] = [];
   // bordo della cella
-  private border: Nullable<Graphics>[][] = [];
+  //private border: Nullable<Graphics>[][] = [];
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
@@ -35,10 +38,10 @@ export class MapMatrix {
       this.typeCell[i] = [];
       this.chunkRow[i] = [];
       this.chunkCol[i] = [];
-      this.colorPlayer[i] = [];
-      this.border[i] = [];
+      // this.colorPlayer[i] = [];
+      // this.border[i] = [];
       for (let j = 0; j < nchunkCol * RigheColonne; j++) {
-        this.owner[i][j] = 1 + i + j;
+        this.owner[i][j] = 1;
         this.typeCell[i][j] = -1;
 
         const chunkR = Math.floor(i / this.RigheColonne);
@@ -53,51 +56,68 @@ export class MapMatrix {
         //   idChunk++;
         // }
 
-        this.border[i][j] = null;
-        const rect: Sprite = createColorSprite(
-          i,
-          j,
-          distanzaWidthHeight,
-          'blue',
-          0.7,
-          0,
-        );
-        this.colorPlayer[i][j] = rect;
-        const borderTmp: Graphics = createBorderGraphic(
-          i,
-          j,
-          distanzaWidthHeight,
-          'green',
-          1,
-          true,
-          true,
-          true,
-          true,
-        );
-        this.border[i][j] = borderTmp;
+        // this.border[i][j] = null;
+        // const rect: Sprite = createColorSprite(
+        //   i,
+        //   j,
+        //   distanzaWidthHeight,
+        //   'blue',
+        //   0.7,
+        //   0,
+        // );
+        // this.colorPlayer[i][j] = rect;
+        // const borderTmp: Graphics = createBorderGraphic(
+        //   i,
+        //   j,
+        //   distanzaWidthHeight,
+        //   'green',
+        //   1,
+        //   true,
+        //   true,
+        //   true,
+        //   true,
+        // );
+        // this.border[i][j] = borderTmp;
 
-        if (rect) {
-          world.addChild(rect);
-        }
-        if (this.border[i][j]) {
-          // world.addChild(borderTmp);
-        }
+        // if (rect) {
+        //   world.addChild(rect);
+        // }
+        // if (this.border[i][j]) {
+        //   // world.addChild(borderTmp);
+        // }
       }
     }
     // creo matrice id chunk qui
-    let idChunk: number = 0;
     for (let r = 0; r < this.nchunkRow; r++) {
       this.chunkid[r] = [];
       for (let c = 0; c < this.nchunkCol; c++) {
-        this.chunkid[r][c] = idChunk;
-        idChunk++;
+        this.chunkid[r][c] = `${r}_${c}`;
+        this.mapChunk.set(
+          this.chunkid[r][c],
+          new Chunk(distanzaWidthHeight, RigheColonne, r, c, this.owner, world),
+        );
       }
     }
   }
 
-  public setMatrixCelleColor(riga: number, colonna: number, bg: string) {
-    if (this.colorPlayer[riga][colonna]) {
-      creazioneRettangoloReuseSprite(bg, this.colorPlayer[riga][colonna]);
+  public setMatrixCelleColor(row: number, col: number, bg: string) {
+    const rowChunk = Math.trunc(row / this.RigheColonne);
+    const colChunk = Math.trunc(col / this.RigheColonne);
+    const rowRelativeChunk = row % this.RigheColonne;
+    const colRelativeChunk = col % this.RigheColonne;
+    const matrixRednder: Nullable<Chunk> | undefined = this.mapChunk.get(
+      this.chunkid[rowChunk][colChunk],
+    );
+    console.log(this.chunkid[rowChunk][colChunk]);
+    // console.log(
+    //   this.chunkid[row][col],
+    //   matrixRednder?.getmMtrixCelle(row, col),
+    // );
+    if (matrixRednder) {
+      creazioneRettangoloReuseSprite(
+        bg,
+        matrixRednder.getmMtrixCelle(rowRelativeChunk, colRelativeChunk),
+      );
     }
   }
 
