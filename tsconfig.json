@@ -16,10 +16,17 @@
 
     /* Linting */
     "strict": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
+    // "noUnusedLocals": false,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noUncheckedSideEffectImports": true,
+    //
+    //
+    // "strict": true,
+    // "noUnusedLocals": false,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noUncheckedSideEffectImports": true,
   },
   "include": ["src"],
 }

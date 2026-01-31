@@ -114,10 +114,7 @@ export class MapMatrix {
     //   matrixRednder?.getmMtrixCelle(row, col),
     // );
     if (matrixRednder) {
-      creazioneRettangoloReuseSprite(
-        bg,
-        matrixRednder.getmMtrixCelle(rowRelativeChunk, colRelativeChunk),
-      );
+      matrixRednder.setMatrixCelleColor(rowRelativeChunk, colRelativeChunk, bg);
     }
   }
 

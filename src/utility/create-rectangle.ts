@@ -67,6 +67,8 @@ export const createColorSprite = (
   nchunkRow: number,
   nchunkCol: number,
   RigheColonne: number,
+  width: number,
+  height: number,
   color: string,
   alpha: number,
   zIndex: number,
@@ -77,17 +79,34 @@ export const createColorSprite = (
     nchunkCol * RigheColonne * distanzaWidthHeight;
   rect.y =
     riga * distanzaWidthHeight + nchunkRow * RigheColonne * distanzaWidthHeight;
-  rect.width = distanzaWidthHeight;
-  rect.height = distanzaWidthHeight;
+  rect.width = width;
+  rect.height = height;
   rect.tint = color;
   rect.alpha = alpha;
   rect.zIndex = zIndex;
+  rect.visible = false;
   return rect;
+};
+
+export const reuseColorSprite = (
+  width: number,
+  height: number,
+  visible: boolean,
+  color: string,
+  rect: Sprite,
+) => {
+  rect.width = width;
+  rect.height = height;
+  rect.visible = visible;
+  rect.tint = color;
 };
 
 export const creazioneRettangoloReuseSprite = (
   bg: string,
   chunk: cellChunk,
 ) => {
-  chunk.colorPlayer.tint = bg;
+  console.log(chunk);
+  if (chunk.colorPlayer) {
+    chunk.colorPlayer.tint = bg;
+  }
 };
