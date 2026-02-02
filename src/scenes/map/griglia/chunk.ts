@@ -116,28 +116,6 @@ export class Chunk {
 
   setMatrixCelleColor(riga: number, colonna: number, bg: string) {
     this.removeChildrenContiner();
-    // for (let i = 0; i < this.RigheColonne; i++) {
-    //   for (let j = 0; j < this.RigheColonne; j++) {
-    //     reuseColorSprite(
-    //       this.distanzaWidthHeight,
-    //       this.distanzaWidthHeight,
-    //       false,
-    //       'blue',
-    //       this.matrixChunk[0][0].colorPlayer,
-    //     );
-    //   }
-    // }
-
-    this.owner[this.RigheColonne * this.nchunkRow][
-      this.RigheColonne * this.nchunkCol
-    ] = 10;
-    this.owner[this.RigheColonne * this.nchunkRow + 1][
-      this.RigheColonne * this.nchunkCol + 2
-    ] = 10;
-    this.owner[this.RigheColonne * this.nchunkRow + 2][
-      this.RigheColonne * this.nchunkCol + 2
-    ] = 10;
-
     if (this.optimizaAllChunk()) {
       reuseColorSprite(
         this.distanzaWidthHeight * this.RigheColonne,
@@ -180,7 +158,7 @@ export class Chunk {
           width - this.distanzaWidthHeight,
           this.distanzaWidthHeight,
           true,
-          bg,
+          lastOwner === 1 ? 'blue' : 'red',
           this.matrixChunk[row][colStart].colorPlayer,
         );
         this.addSpriteContainer(this.matrixChunk[row][colStart].colorPlayer);
@@ -193,7 +171,7 @@ export class Chunk {
           width,
           this.distanzaWidthHeight,
           true,
-          bg,
+          lastOwner === 1 ? 'blue' : 'red',
           this.matrixChunk[row][colStart].colorPlayer,
         );
         console.log('fattoooo111');
