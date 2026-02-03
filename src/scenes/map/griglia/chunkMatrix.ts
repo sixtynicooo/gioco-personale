@@ -49,42 +49,6 @@ export class MapMatrix {
 
         this.chunkRow[i][j] = chunkR;
         this.chunkCol[i][j] = chunkC;
-        // console.log('ciao');
-        // if (j % RigheColonne === 0) {
-        //   console.log(this.chunkid, idChunk, i, j, RigheColonne);
-        //   this.chunkid[i / RigheColonne][j / RigheColonne] = idChunk;
-        //   idChunk++;
-        // }
-
-        // this.border[i][j] = null;
-        // const rect: Sprite = createColorSprite(
-        //   i,
-        //   j,
-        //   distanzaWidthHeight,
-        //   'blue',
-        //   0.7,
-        //   0,
-        // );
-        // this.colorPlayer[i][j] = rect;
-        // const borderTmp: Graphics = createBorderGraphic(
-        //   i,
-        //   j,
-        //   distanzaWidthHeight,
-        //   'green',
-        //   1,
-        //   true,
-        //   true,
-        //   true,
-        //   true,
-        // );
-        // this.border[i][j] = borderTmp;
-
-        // if (rect) {
-        //   world.addChild(rect);
-        // }
-        // if (this.border[i][j]) {
-        //   // world.addChild(borderTmp);
-        // }
       }
     }
     // creo matrice id chunk qui

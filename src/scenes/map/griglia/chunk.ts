@@ -135,8 +135,87 @@ export class Chunk {
   private optimizeLineAllNumber(bg: string) {
     const rowGlobal = this.RigheColonne * this.nchunkRow;
     const colGlobal = this.RigheColonne * this.nchunkCol;
+    this.optimizeGreedyNumber(rowGlobal, colGlobal, bg);
+    // for (let row = 0; row < this.RigheColonne; row++) {
+    //   this.optimizeRowNumber(rowGlobal, colGlobal, row, bg);
+    // }
+  }
+
+  // attenzione usata gpt da rivedere bene, partito da optimizeRowNumber che funziona (ho fatto delle prove e sembra funzionare. Ho anche controlla)
+  private optimizeGreedyNumber(
+    rowGlobal: number,
+    colGlobal: number,
+    bg: string,
+  ) {
+    const used = Array.from({ length: this.RigheColonne }, () =>
+      Array(this.RigheColonne).fill(false),
+    );
+
+    const cellSize = this.distanzaWidthHeight;
+
     for (let row = 0; row < this.RigheColonne; row++) {
-      this.optimizeRowNumber(rowGlobal, colGlobal, row, bg);
+      for (let col = 0; col < this.RigheColonne; col++) {
+        // già visitato
+        if (used[row][col]) {
+          continue;
+        }
+
+        const gRow = rowGlobal + row;
+        const gCol = colGlobal + col;
+
+        const owner = this.owner[gRow][gCol];
+
+        // non voglio sprite se owner è null
+        if (owner == null) continue;
+
+        // scansiono la lunghezza tenendo conto stesso owner
+        let widthCells = 0;
+        while (
+          col + widthCells < this.RigheColonne &&
+          !used[row][col + widthCells] &&
+          this.owner[gRow][colGlobal + col + widthCells] === owner
+        ) {
+          widthCells++;
+        }
+
+        // scansiono altezza tenendo conto stesso owner
+        let heightCells = 1;
+        let canGrow = true;
+
+        while (canGrow && row + heightCells < this.RigheColonne) {
+          for (let x = 0; x < widthCells; x++) {
+            if (
+              used[row + heightCells][col + x] ||
+              this.owner[rowGlobal + row + heightCells][colGlobal + col + x] !==
+                owner
+            ) {
+              canGrow = false;
+              break;
+            }
+          }
+          if (canGrow) {
+            heightCells++;
+          }
+        }
+
+        // marchio le celle usate
+        for (let y = 0; y < heightCells; y++) {
+          for (let x = 0; x < widthCells; x++) {
+            used[row + y][col + x] = true;
+          }
+        }
+
+        // creo rettangolo
+        reuseColorSprite(
+          widthCells * cellSize,
+          heightCells * cellSize,
+          true,
+          owner === 1 ? 'blue' : 'red',
+          this.matrixChunk[row][col].colorPlayer,
+        );
+
+        this.addSpriteContainer(this.matrixChunk[row][col].colorPlayer);
+      }
     }
   }
 
