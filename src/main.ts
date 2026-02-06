@@ -4,8 +4,8 @@ import { GameMap } from './scenes/game';
 (async () => {
   // prima o poi si dovrà utilizzare chunk
   const distanzaWidthHeight = 10;
-  const RigheColonne = 16;
-  const nchunkRow = 50;
+  const RigheColonne = 32;
+  const nchunkRow = 20;
   const nchunkCol = nchunkRow;
 
   // Create a new application

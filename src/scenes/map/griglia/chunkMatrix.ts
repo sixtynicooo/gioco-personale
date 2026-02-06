@@ -77,7 +77,10 @@ export class MapMatrix {
     //   this.chunkid[row][col],
     //   matrixRednder?.getmMtrixCelle(row, col),
     // );
-    this.owner[row][col] = 10;
+    this.owner[row][col] =
+      this.owner[row][col] === 1
+        ? (this.owner[row][col] = 10)
+        : (this.owner[row][col] = 1);
     if (matrixRednder) {
       matrixRednder.setMatrixCelleColor(rowRelativeChunk, colRelativeChunk, bg);
     }

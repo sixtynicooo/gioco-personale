@@ -1,4 +1,4 @@
-import { Graphics, Sprite, Texture } from 'pixi.js';
+import { Container, ContainerChild, Graphics, Sprite, Texture } from 'pixi.js';
 import { cellChunk } from '../scenes/map/griglia/chunk';
 
 export const createBorderGraphic = (
@@ -75,6 +75,8 @@ export const createColorSprite = (
   zIndex: number,
 ) => {
   const rect = new Sprite(Texture.WHITE);
+  // rect.x = colonna * distanzaWidthHeight;
+  // rect.y = riga * distanzaWidthHeight;
   rect.x =
     colonna * distanzaWidthHeight +
     nchunkCol * RigheColonne * distanzaWidthHeight;
@@ -85,21 +87,48 @@ export const createColorSprite = (
   rect.tint = color;
   rect.alpha = alpha;
   rect.zIndex = zIndex;
-  rect.visible = false;
+  rect.visible = true;
   return rect;
 };
 
+// crea o riusa sprite
 export const reuseColorSprite = (
+  rowGlobal: number,
+  colGlobal: number,
+  rowRelative: number,
+  colRelative: number,
+  distanzaWidthHeight: number,
+  RigheColonne: number,
+  nchunkRow: number,
+  nchunkCol: number,
   width: number,
   height: number,
-  visible: boolean,
   color: string,
-  rect: Sprite,
+  matrixChunk: cellChunk[][],
+  chunkReder: Container<ContainerChild>,
 ) => {
-  rect.width = width;
-  rect.height = height;
-  rect.visible = visible;
-  rect.tint = color;
+  if (matrixChunk[rowRelative][colRelative].colorPlayer) {
+    const rect = matrixChunk[rowRelative][colRelative].colorPlayer;
+    rect.width = width;
+    rect.height = height;
+    rect.tint = color;
+  } else {
+    const rect: Sprite = createColorSprite(
+      rowRelative,
+      colRelative,
+      distanzaWidthHeight,
+      nchunkRow,
+      nchunkCol,
+      RigheColonne,
+      width,
+      height,
+      color,
+      0.7,
+      0,
+    );
+    chunkReder.addChild(rect);
+    matrixChunk[rowRelative][colRelative].colorPlayer = rect;
+  }
 };
 
 export const creazioneRettangoloReuseSprite = (
