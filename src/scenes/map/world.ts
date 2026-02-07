@@ -8,15 +8,19 @@ import {
 import { Viewport } from 'pixi-viewport';
 import { MapMatrix } from './griglia/chunkMatrix';
 
+const urlAssetColor = 'src/assets/colorPlayer.json';
+
 export class World {
   private world: Container<ContainerChild>;
   private matrixChunk: MapMatrix;
+
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
     private nchunkRow: number,
     private nchunkCol: number,
     private app: Application<Renderer>,
+    private coloriPlayerOwner: Map<number, string>,
   ) {
     this.world = new Container({
       width: distanzaWidthHeight * RigheColonne * nchunkCol,
@@ -32,6 +36,7 @@ export class World {
       nchunkRow,
       nchunkCol,
       this.world,
+      this.coloriPlayerOwner,
     );
 
     // Center bunny sprite in local container coordinates
@@ -54,16 +59,9 @@ export class World {
       const wordPosition = cameraInstance.toWorld(e.screenX, e.screen.y);
       const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
       const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
-      // console.log(
-      //   wordPosition,
-      //   riga,
-      //   colonna,
-      //   this.matrixChunk.getChunkRowCol(riga, colonna),
-      // );
       console.log(wordPosition, riga, colonna);
-      // console.log(this.matrixChunk.getChunkRowCol(riga, colonna));
 
-      this.matrixChunk.setMatrixCelleColor(riga, colonna, 'red');
+      this.matrixChunk.setMatrixCelleColor(riga, colonna);
     });
   }
 }

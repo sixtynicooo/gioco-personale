@@ -70,7 +70,7 @@ export const createColorSprite = (
   RigheColonne: number,
   width: number,
   height: number,
-  color: string,
+  color: string | undefined,
   alpha: number,
   zIndex: number,
 ) => {
@@ -84,7 +84,7 @@ export const createColorSprite = (
     riga * distanzaWidthHeight + nchunkRow * RigheColonne * distanzaWidthHeight;
   rect.width = width;
   rect.height = height;
-  rect.tint = color;
+  rect.tint = color ?? '#000000';
   rect.alpha = alpha;
   rect.zIndex = zIndex;
   rect.visible = true;
@@ -103,7 +103,7 @@ export const reuseColorSprite = (
   nchunkCol: number,
   width: number,
   height: number,
-  color: string,
+  color: string | undefined,
   matrixChunk: cellChunk[][],
   chunkReder: Container<ContainerChild>,
 ) => {
@@ -111,7 +111,7 @@ export const reuseColorSprite = (
     const rect = matrixChunk[rowRelative][colRelative].colorPlayer;
     rect.width = width;
     rect.height = height;
-    rect.tint = color;
+    rect.tint = color ?? '#000000';
   } else {
     const rect: Sprite = createColorSprite(
       rowRelative,

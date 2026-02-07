@@ -25,6 +25,7 @@ export class Chunk {
     private nchunkCol: number,
     private owner: number[][],
     private world: Container<ContainerChild>,
+    private coloriPlayerOwner: Map<number, string>,
   ) {
     this.coordinateGlobalRow = RigheColonne * nchunkRow;
     this.coordinateGlobalCol = RigheColonne * nchunkCol;
@@ -35,67 +36,14 @@ export class Chunk {
     for (let i = 0; i < RigheColonne; i++) {
       this.matrixChunk[i] = [];
       for (let j = 0; j < RigheColonne; j++) {
-        const rect: Nullable<Sprite> = null;
-        // const rect: Nullable<Sprite> = createColorSprite(
-        //   i,
-        //   j,
-        //   distanzaWidthHeight,
-        //   nchunkRow,
-        //   nchunkCol,
-        //   RigheColonne,
-        //   distanzaWidthHeight,
-        //   distanzaWidthHeight,
-        //   'blue',
-        //   0.7,
-        //   0,
-        // );
-        const border: Nullable<Graphics> = null;
-        // const border: Graphics = createBorderGraphic(
-        //   i,
-        //   j,
-        //   distanzaWidthHeight,
-        //   nchunkRow,
-        //   nchunkCol,
-        //   RigheColonne,
-        //   'green',
-        //   false,
-        //   1,
-        //   true,
-        //   true,
-        //   true,
-        //   true,
-        // );
-
         this.matrixChunk[i][j] = {
-          colorPlayer: rect,
+          colorPlayer: null,
           border: null,
         };
       }
     }
     // gestisco ottimizzazioni per risparmiare sprite
-    if (this.optimizaAllChunk()) {
-      reuseColorSprite(
-        this.coordinateGlobalRow,
-        this.coordinateGlobalCol,
-        0,
-        0,
-        distanzaWidthHeight,
-        RigheColonne,
-        nchunkRow,
-        nchunkCol,
-        distanzaWidthHeight * this.RigheColonne,
-        distanzaWidthHeight * this.RigheColonne,
-        'blue',
-        this.matrixChunk,
-        this.chunkReder,
-      );
-      this.addSpriteContainer(this.matrixChunk[0][0].colorPlayer);
-      console.log(
-        this.matrixChunk[0][0],
-        distanzaWidthHeight * RigheColonne,
-        distanzaWidthHeight * RigheColonne,
-      );
-    }
+    this.optimizationAll(this.coordinateGlobalRow, this.coordinateGlobalCol);
     world.addChild(this.chunkReder);
   }
   // verifico se tutto il chunk può essere sostituito con unoo sprite
@@ -148,17 +96,13 @@ export class Chunk {
     }
   }
 
-  setMatrixCelleColor(riga: number, colonna: number, bg: string) {
+  setMatrixCelleColor(riga: number, colonna: number) {
     this.destroySprite();
+    this.optimizationAll(riga, colonna);
+  }
+
+  private optimizationAll(riga: number, colonna: number) {
     if (this.optimizaAllChunk()) {
-      // reuseColorSprite(
-      //   this.distanzaWidthHeight * this.RigheColonne,
-      //   this.distanzaWidthHeight * this.RigheColonne,
-      //   true,
-      //   bg,
-      //   this.matrixChunk[0][0].colorPlayer,
-      // );
-      //
       reuseColorSprite(
         this.coordinateGlobalRow,
         this.coordinateGlobalCol,
@@ -170,33 +114,31 @@ export class Chunk {
         this.nchunkCol,
         this.distanzaWidthHeight * this.RigheColonne,
         this.distanzaWidthHeight * this.RigheColonne,
-        'blue',
+        this.coloriPlayerOwner.get(
+          this.owner[this.coordinateGlobalRow][this.coordinateGlobalCol],
+        ),
         this.matrixChunk,
         this.chunkReder,
       );
       this.addSpriteContainer(this.matrixChunk[0][0].colorPlayer);
       console.log(this.matrixChunk[0][0]);
     } else {
-      this.optimizeLineAllNumber(bg);
+      this.optimizeLineAllNumber();
     }
   }
 
   // cerco di capire quanti rettangoli si possono usare per ogni riga (ho visto che è rispecchiato con colonne quindi non ha senso fare 2 calcoli)
-  private optimizeLineAllNumber(bg: string) {
+  private optimizeLineAllNumber() {
     const rowGlobal = this.RigheColonne * this.nchunkRow;
     const colGlobal = this.RigheColonne * this.nchunkCol;
-    this.optimizeGreedyNumber(rowGlobal, colGlobal, bg);
+    this.optimizeGreedyNumber(rowGlobal, colGlobal);
     // for (let row = 0; row < this.RigheColonne; row++) {
     //   this.optimizeRowNumber(rowGlobal, colGlobal, row, bg);
     // }
   }
 
   // tecnica greedy per diminuire velocemente sprite
-  private optimizeGreedyNumber(
-    rowGlobal: number,
-    colGlobal: number,
-    bg: string,
-  ) {
+  private optimizeGreedyNumber(rowGlobal: number, colGlobal: number) {
     const used = Array.from({ length: this.RigheColonne }, () =>
       Array(this.RigheColonne).fill(false),
     );
@@ -266,7 +208,11 @@ export class Chunk {
           this.nchunkCol,
           widthCells * cellSize,
           heightCells * cellSize,
-          owner === 1 ? 'blue' : 'red',
+          this.coloriPlayerOwner.get(
+            this.owner[this.coordinateGlobalRow + row][
+              this.coordinateGlobalCol + col
+            ],
+          ),
           this.matrixChunk,
           this.chunkReder,
         );

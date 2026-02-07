@@ -21,17 +21,13 @@ export class MapMatrix {
   // mappa rendering chunk, se non usato il campo sarà semplicemente null
   private mapChunk = new Map<string, Nullable<Chunk>>();
 
-  // rendering
-  // colore della cella
-  //private colorPlayer: Nullable<Sprite>[][] = [];
-  // bordo della cella
-  //private border: Nullable<Graphics>[][] = [];
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
     private nchunkRow: number,
     private nchunkCol: number,
     private world: Container<ContainerChild>,
+    private coloriPlayerOwner: Map<number, string>,
   ) {
     for (let i = 0; i < nchunkRow * RigheColonne; i++) {
       this.owner[i] = [];
@@ -41,9 +37,18 @@ export class MapMatrix {
       // this.colorPlayer[i] = [];
       // this.border[i] = [];
       for (let j = 0; j < nchunkCol * RigheColonne; j++) {
-        this.owner[i][j] = 1;
+        if (
+          i === 0 ||
+          i === nchunkRow * RigheColonne - 1 ||
+          j === 0 ||
+          j === nchunkCol * RigheColonne - 1
+        ) {
+          this.owner[i][j] = -1;
+        } else {
+          this.owner[i][j] = 1;
+        }
+        //this.owner[i][j] = 1;
         this.typeCell[i][j] = -1;
-
         const chunkR = Math.floor(i / this.RigheColonne);
         const chunkC = Math.floor(j / this.RigheColonne);
 
@@ -56,15 +61,24 @@ export class MapMatrix {
       this.chunkid[r] = [];
       for (let c = 0; c < this.nchunkCol; c++) {
         this.chunkid[r][c] = `${r}_${c}`;
+        console.log(r, c);
         this.mapChunk.set(
           this.chunkid[r][c],
-          new Chunk(distanzaWidthHeight, RigheColonne, r, c, this.owner, world),
+          new Chunk(
+            distanzaWidthHeight,
+            RigheColonne,
+            r,
+            c,
+            this.owner,
+            world,
+            this.coloriPlayerOwner,
+          ),
         );
       }
     }
   }
 
-  public setMatrixCelleColor(row: number, col: number, bg: string) {
+  public setMatrixCelleColor(row: number, col: number) {
     const rowChunk = Math.trunc(row / this.RigheColonne);
     const colChunk = Math.trunc(col / this.RigheColonne);
     const rowRelativeChunk = row % this.RigheColonne;
@@ -72,17 +86,16 @@ export class MapMatrix {
     const matrixRednder: Nullable<Chunk> | undefined = this.mapChunk.get(
       this.chunkid[rowChunk][colChunk],
     );
-    //console.log(this.chunkid[rowChunk][colChunk]);
-    // console.log(
-    //   this.chunkid[row][col],
-    //   matrixRednder?.getmMtrixCelle(row, col),
-    // );
+    console.log(this.owner[row][col]);
+    if (this.owner[row][col] === -1) {
+      return;
+    }
     this.owner[row][col] =
       this.owner[row][col] === 1
         ? (this.owner[row][col] = 10)
         : (this.owner[row][col] = 1);
     if (matrixRednder) {
-      matrixRednder.setMatrixCelleColor(rowRelativeChunk, colRelativeChunk, bg);
+      matrixRednder.setMatrixCelleColor(rowRelativeChunk, colRelativeChunk);
     }
   }
 
