@@ -10,6 +10,7 @@ export class GameMap {
     private RigheColonne: number,
     private nchunkRow: number,
     private nchunkCol: number,
+    private nChunkActive: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
   ) {
@@ -18,6 +19,7 @@ export class GameMap {
       RigheColonne,
       nchunkRow,
       nchunkCol,
+      nChunkActive,
       app,
       coloriPlayerOwner,
     );
@@ -28,12 +30,13 @@ export class GameMap {
       this.world,
     );
     this.world.addEventClickWord(this.cameraInstance.getViewport());
+    this.world.setCameraInstance(this.cameraInstance);
+    this.world.init();
   }
 
   updateChunkVisible() {
     console.log(this.cameraInstance.getViewport().getVisibleBounds());
-    console.log();
-    window.screenLeft;
+    this.world.init();
     //console.log(this.cameraInstance.getViewport());
     //console.log(window.innerWidth, window.innerHeight);
     //console.log(this.world.getWorld().getLocalBounds());

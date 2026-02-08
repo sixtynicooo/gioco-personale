@@ -17,6 +17,8 @@ export class Chunk {
   private chunkReder: Container<ContainerChild>;
   private coordinateGlobalRow: number;
   private coordinateGlobalCol: number;
+  // visibile o meno questo chunk, basta togliere il suo chunkReder dal world
+  public visible: boolean = false;
 
   constructor(
     private distanzaWidthHeight: number,
@@ -26,6 +28,7 @@ export class Chunk {
     private owner: number[][],
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
+    private keyMapChunk: string,
   ) {
     this.coordinateGlobalRow = RigheColonne * nchunkRow;
     this.coordinateGlobalCol = RigheColonne * nchunkCol;
@@ -43,9 +46,24 @@ export class Chunk {
       }
     }
     // gestisco ottimizzazioni per risparmiare sprite
-    this.optimizationAll(this.coordinateGlobalRow, this.coordinateGlobalCol);
-    world.addChild(this.chunkReder);
+    //this.optimizationAll(this.coordinateGlobalRow, this.coordinateGlobalCol);
+    //world.addChild(this.chunkReder);
   }
+
+  public setChunkActive() {
+    this.world.addChild(this.chunkReder);
+    this.optimizationAll(this.coordinateGlobalRow, this.coordinateGlobalCol);
+    this.visible = true;
+    console.log(this.keyMapChunk);
+    //console.log(this.world.children);
+  }
+
+  public setChunkDelete() {
+    this.destroySprite();
+    this.world.removeChild(this.chunkReder);
+    this.visible = false;
+  }
+
   // verifico se tutto il chunk può essere sostituito con unoo sprite
   private optimizaAllChunk(): boolean {
     const idOwner: number =
@@ -121,7 +139,7 @@ export class Chunk {
         this.chunkReder,
       );
       this.addSpriteContainer(this.matrixChunk[0][0].colorPlayer);
-      console.log(this.matrixChunk[0][0]);
+      //console.log(this.matrixChunk[0][0]);
     } else {
       this.optimizeLineAllNumber();
     }
