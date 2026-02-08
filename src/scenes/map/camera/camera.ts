@@ -1,16 +1,17 @@
-import { Viewport } from 'pixi-viewport';
+import { Drag, Viewport } from 'pixi-viewport';
 import { Application, Renderer } from 'pixi.js';
 import { World } from '../world';
+import { DragEvent } from 'pixi-viewport/dist/types';
 
 // https://viewport.pixijs.io/ e https://github.com/pixijs-userland/pixi-viewport
 export class Camera {
   private viewport: Viewport;
-
+  private dragPoint: any;
   constructor(
     private app: Application<Renderer>,
     private distanzaWidthHeight: number,
     private RigheColonne: number,
-    private worldTmp: World,
+    private world: World,
   ) {
     this.viewport = new Viewport({
       screenWidth: app.screen.width,
@@ -34,7 +35,9 @@ export class Camera {
     //     // maxHeight: this.distanzaWidthHeight * this.RigheColonne, // altezza massima
     //   })
     //   .pinch({ percent: 1 });
-
+    // Forza la camera all'angolo in alto a sinistra del mondo
+    // this.viewport.x = 0;
+    // this.viewport.y = 0;
     this.viewport
       .drag()
       .wheel({
@@ -42,14 +45,39 @@ export class Camera {
         smooth: 3, // opzionale, rende lo zoom più fluido
       })
       .pinch({ percent: 1 }); // supporto touch
+
+    // aggiungo eventi drag drop
+    this.viewport.on('drag-end', (e: DragEvent) => {
+      this.world.addEventDragDropWord(this.viewport, e.screen.x, e.screen.y);
+      console.log(e);
+    });
     // aggiungiamo il viewport al stage principale
-    this.viewport.addChild(worldTmp.getWorld());
+    this.viewport.addChild(world.getWorld());
     app.stage.addChild(this.viewport);
   }
 
   public getViewport() {
     return this.viewport;
   }
+
+  onDragStart = (event: any) => {
+    event.stopPropagation();
+    this.dragPoint = event.data.getLocalPosition(this.world.getWorld());
+    this.dragPoint.x -= this.world.getWorld().x;
+    this.dragPoint.y -= this.world.getWorld().y;
+    this.world.getWorld().on('pointermove', this.onDragMove);
+  };
+
+  onDragMove = (event: any) => {
+    const newPoint = event.data.getLocalPosition(this.world.getWorld());
+    this.world.getWorld().x = newPoint.x - this.dragPoint.x;
+    this.world.getWorld().y = newPoint.y - this.dragPoint.y;
+  };
+
+  onDragEnd = (event: any) => {
+    event.stopPropagation();
+    this.world.getWorld().off('pointermove', this.onDragMove);
+  };
 }
 
 // export function create(renderer) {

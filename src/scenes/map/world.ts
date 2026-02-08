@@ -7,6 +7,7 @@ import {
 } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { MapMatrix } from './griglia/chunkMatrix';
+import { DragEvent } from 'pixi-viewport/dist/types';
 
 const urlAssetColor = 'src/assets/colorPlayer.json';
 
@@ -63,5 +64,16 @@ export class World {
 
       this.matrixChunk.setMatrixCelleColor(riga, colonna);
     });
+  }
+  public addEventDragDropWord(
+    cameraInstance: Viewport,
+    screenX: number,
+    screenY: number,
+  ) {
+    const wordPosition = cameraInstance.toWorld(screenX, screenY);
+    const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
+    const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
+    console.log(wordPosition, riga, colonna);
+    this.matrixChunk.setMatrixCelleColor(riga, colonna);
   }
 }

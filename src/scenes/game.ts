@@ -2,11 +2,9 @@ import { Application, Renderer, Ticker } from 'pixi.js';
 import { World } from './map/world';
 import { Camera } from './map/camera/camera';
 
-const urlAssetColor = 'src/assets/colorPlayer.json';
-
 export class GameMap {
   private world: World;
-  //private coloriPlayerOwner: Map<number, string> = new Map<number, string>();
+  private cameraInstance: Camera;
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
@@ -23,12 +21,21 @@ export class GameMap {
       app,
       coloriPlayerOwner,
     );
-    const cameraInstance = new Camera(
+    this.cameraInstance = new Camera(
       app,
       distanzaWidthHeight,
       RigheColonne,
       this.world,
-    ).getViewport();
-    this.world.addEventClickWord(cameraInstance);
+    );
+    this.world.addEventClickWord(this.cameraInstance.getViewport());
+  }
+
+  updateChunkVisible() {
+    console.log(this.cameraInstance.getViewport().getVisibleBounds());
+    console.log();
+    window.screenLeft;
+    //console.log(this.cameraInstance.getViewport());
+    //console.log(window.innerWidth, window.innerHeight);
+    //console.log(this.world.getWorld().getLocalBounds());
   }
 }

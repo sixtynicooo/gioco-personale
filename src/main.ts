@@ -8,7 +8,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   // prima o poi si dovrà utilizzare chunk
   const distanzaWidthHeight = 10;
   const RigheColonne = 32;
-  const nchunkRow = 30;
+  const nchunkRow = 10;
   const nchunkCol = nchunkRow;
 
   // recupero colori per le celle
@@ -47,6 +47,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
     ticker.add((ticker) => {
       // logica gioco
       const a = ticker;
+      //game.updateChunkVisible();
       //console.log(`Delta Time: ${ticker.deltaTime}`);
     });
     ticker.start();
