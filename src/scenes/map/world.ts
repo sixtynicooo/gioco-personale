@@ -23,6 +23,7 @@ export class World {
     private RigheColonne: number,
     private nchunkRow: number,
     private nchunkCol: number,
+    private nChunkActive: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
     private dirrtyChunk:Map<string, DirtyChunk>
@@ -40,6 +41,7 @@ export class World {
       RigheColonne,
       nchunkRow,
       nchunkCol,
+      nChunkActive,
       this.world,
       this.coloriPlayerOwner,
       this.chunkid

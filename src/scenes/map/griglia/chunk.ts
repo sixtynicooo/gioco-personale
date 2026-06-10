@@ -17,6 +17,8 @@ export class Chunk {
   private chunkReder: Container<ContainerChild>;
   private coordinateGlobalRow: number;
   private coordinateGlobalCol: number;
+  // visibile o meno questo chunk, basta togliere il suo chunkReder dal world
+  public visible: boolean = false;
 
   constructor(
     private distanzaWidthHeight: number,

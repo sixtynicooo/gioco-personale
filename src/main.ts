@@ -12,15 +12,18 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 (async () => {
   // prima o poi si dovrà utilizzare chunk
+  // max 10 chunk per lato
   const distanzaWidthHeight = 10;
   const RigheColonne = 32;
   const nchunkRow = 10;
   const nchunkCol = nchunkRow;
+
   let dirtyChunks = new Map<string, DirtyChunk>();
 
   const configApp={
     maxFPS:30
   }
+
 
   // recupero colori per le celle
   try {
@@ -38,6 +41,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
     preference: 'webgpu',
     width: distanzaWidthHeight * RigheColonne * nchunkCol,
     height: distanzaWidthHeight * RigheColonne * nchunkRow,
+    preference: 'webgpu', // raccomandato
   });
 
   // Append the application canvas to the document body
@@ -52,6 +56,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
       RigheColonne,
       nchunkRow,
       nchunkCol,
+      nChunkActive,
       app,
       coloriPlayerOwner,
       dirtyChunks

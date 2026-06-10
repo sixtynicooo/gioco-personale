@@ -19,12 +19,14 @@ export class MapMatrix {
   private chunkCol: number[][] = [];
   // mappa rendering chunk, se non usato il campo sarà semplicemente null
   private mapChunk = new Map<string, Nullable<Chunk>>();
+  private activeChunk = new Map<string, Nullable<Chunk>>();
 
   constructor(
     private distanzaWidthHeight: number,
     private RigheColonne: number,
     private nchunkRow: number,
     private nchunkCol: number,
+    private nChunkActive: number,
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
     // id chunk

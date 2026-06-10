@@ -12,6 +12,7 @@ export class GameMap {
     private RigheColonne: number,
     private nchunkRow: number,
     private nchunkCol: number,
+    private nChunkActive: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
     private dirtyChunks:Map<string, DirtyChunk>
@@ -21,6 +22,7 @@ export class GameMap {
       RigheColonne,
       nchunkRow,
       nchunkCol,
+      nChunkActive,
       app,
       coloriPlayerOwner,
       dirtyChunks
@@ -32,6 +34,8 @@ export class GameMap {
       this.world,
     );
     this.world.addEventClickWord(this.cameraInstance.getViewport());
+    this.world.setCameraInstance(this.cameraInstance);
+    this.world.init();
   }
 
   updateChunkDirty() {
