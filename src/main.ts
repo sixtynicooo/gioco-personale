@@ -17,7 +17,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   const RigheColonne = 32;
   const nchunkRow = 10;
   const nchunkCol = nchunkRow;
-
+  const nChunkActive = 2;
   let dirtyChunks = new Map<string, DirtyChunk>();
 
   const configApp={
@@ -41,7 +41,6 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
     preference: 'webgpu',
     width: distanzaWidthHeight * RigheColonne * nchunkCol,
     height: distanzaWidthHeight * RigheColonne * nchunkRow,
-    preference: 'webgpu', // raccomandato
   });
 
   // Append the application canvas to the document body

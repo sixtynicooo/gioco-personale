@@ -34,8 +34,8 @@ export class GameMap {
       this.world,
     );
     this.world.addEventClickWord(this.cameraInstance.getViewport());
-    this.world.setCameraInstance(this.cameraInstance);
-    this.world.init();
+    /* this.world.setCameraInstance(this.cameraInstance);
+    this.world.init(); */
   }
 
   updateChunkDirty() {
