@@ -60,24 +60,29 @@ export class Camera {
     return this.viewport;
   }
 
-  onDragStart = (event: any) => {
-    event.stopPropagation();
-    this.dragPoint = event.data.getLocalPosition(this.world.getWorld());
-    this.dragPoint.x -= this.world.getWorld().x;
-    this.dragPoint.y -= this.world.getWorld().y;
-    this.world.getWorld().on('pointermove', this.onDragMove);
-  };
+  public setCenter(width: number, height: number) {
+    this.viewport.moveCenter(width, height);
+    console.log(width, height, this.viewport.center);
+  }
 
-  onDragMove = (event: any) => {
-    const newPoint = event.data.getLocalPosition(this.world.getWorld());
-    this.world.getWorld().x = newPoint.x - this.dragPoint.x;
-    this.world.getWorld().y = newPoint.y - this.dragPoint.y;
-  };
+  // onDragStart = (event: any) => {
+  //   event.stopPropagation();
+  //   this.dragPoint = event.data.getLocalPosition(this.world.getWorld());
+  //   this.dragPoint.x -= this.world.getWorld().x;
+  //   this.dragPoint.y -= this.world.getWorld().y;
+  //   this.world.getWorld().on('pointermove', this.onDragMove);
+  // };
 
-  onDragEnd = (event: any) => {
-    event.stopPropagation();
-    this.world.getWorld().off('pointermove', this.onDragMove);
-  };
+  // onDragMove = (event: any) => {
+  //   const newPoint = event.data.getLocalPosition(this.world.getWorld());
+  //   this.world.getWorld().x = newPoint.x - this.dragPoint.x;
+  //   this.world.getWorld().y = newPoint.y - this.dragPoint.y;
+  // };
+
+  // onDragEnd = (event: any) => {
+  //   event.stopPropagation();
+  //   this.world.getWorld().off('pointermove', this.onDragMove);
+  // };
 }
 
 // export function create(renderer) {

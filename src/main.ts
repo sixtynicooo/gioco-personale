@@ -6,10 +6,14 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 (async () => {
   // prima o poi si dovrà utilizzare chunk
+  // max 10 chunk per lato
   const distanzaWidthHeight = 10;
   const RigheColonne = 32;
   const nchunkRow = 10;
   const nchunkCol = nchunkRow;
+  // quanti chunk vedere, da un punto si vedono 2 chunk a sinistra, 2 a destra, 2 su e 2 giù
+  // se 1 vedrò 9 quadranti, con 2 ben 25
+  const nChunkActive = 1;
 
   // recupero colori per le celle
   try {
@@ -26,6 +30,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   await app.init({
     width: distanzaWidthHeight * RigheColonne * nchunkCol,
     height: distanzaWidthHeight * RigheColonne * nchunkRow,
+    preference: 'webgpu', // raccomandato
   });
 
   // Append the application canvas to the document body
@@ -40,6 +45,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
       RigheColonne,
       nchunkRow,
       nchunkCol,
+      nChunkActive,
       app,
       coloriPlayerOwner,
     );
