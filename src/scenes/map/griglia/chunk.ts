@@ -123,6 +123,7 @@ export class Chunk {
       );
       this.addSpriteContainer(this.matrixChunk[0][0].colorPlayer);
       console.log(this.matrixChunk[0][0]);
+      console.log(this.matrixChunk[0][0]);
     } else {
       this.optimizeLineAllNumber();
     }

@@ -51,6 +51,7 @@ export class World {
 
     this.world.eventMode = 'static';
     this.world.position.set(app.screen.width / 2, app.screen.height / 2);
+    this.world.position.set(app.screen.width / 2, app.screen.height / 2);
   }
 
   public getWorld() {

@@ -12,9 +12,9 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 (async () => {
   // prima o poi si dovrà utilizzare chunk
-  const distanzaWidthHeight = 128;
-  const RigheColonne = 10;
-  const nchunkRow = 4;
+  const distanzaWidthHeight = 10;
+  const RigheColonne = 32;
+  const nchunkRow = 10;
   const nchunkCol = nchunkRow;
   let dirtyChunks = new Map<string, DirtyChunk>();
 
