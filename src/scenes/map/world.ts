@@ -8,12 +8,15 @@ import {
 import { Viewport } from 'pixi-viewport';
 import { MapMatrix } from './griglia/chunkMatrix';
 import { DragEvent } from 'pixi-viewport/dist/types';
+import { DirtyChunk } from '../../main';
 
 const urlAssetColor = 'src/assets/colorPlayer.json';
 
 export class World {
   private world: Container<ContainerChild>;
   private matrixChunk: MapMatrix;
+  // id chunk
+  private chunkid: string[][] = [];
 
   constructor(
     private distanzaWidthHeight: number,
@@ -22,6 +25,7 @@ export class World {
     private nchunkCol: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
+    private dirrtyChunk:Map<string, DirtyChunk>
   ) {
     this.world = new Container({
       width: distanzaWidthHeight * RigheColonne * nchunkCol,
@@ -38,6 +42,7 @@ export class World {
       nchunkCol,
       this.world,
       this.coloriPlayerOwner,
+      this.chunkid
     );
 
     // Center bunny sprite in local container coordinates
@@ -60,20 +65,34 @@ export class World {
       const wordPosition = cameraInstance.toWorld(e.screenX, e.screen.y);
       const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
       const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
+      const rowChunk = Math.trunc(riga / this.RigheColonne);
+      const colChunk = Math.trunc(colonna / this.RigheColonne);
       console.log(wordPosition, riga, colonna);
 
-      this.matrixChunk.setMatrixCelleColor(riga, colonna);
+      console.log('chunkid',this.chunkid,this.chunkid[rowChunk][colChunk])
+      this.updateDirtyChunk(this.chunkid[rowChunk][colChunk],riga,colonna
+      )
+      this.matrixChunk.setMatrixCelleColorNoRendering(riga, colonna);
     });
   }
+
+  private updateDirtyChunk(chunkid:string,riga:number,colonna:number){
+    if(!this.dirrtyChunk.has(chunkid)){
+      this.dirrtyChunk.set(chunkid,{
+        colore:true
+      })
+    }
+  }
+
   public addEventDragDropWord(
     cameraInstance: Viewport,
     screenX: number,
     screenY: number,
   ) {
-    const wordPosition = cameraInstance.toWorld(screenX, screenY);
+    /* const wordPosition = cameraInstance.toWorld(screenX, screenY);
     const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
     const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
     console.log(wordPosition, riga, colonna);
-    this.matrixChunk.setMatrixCelleColor(riga, colonna);
+    this.matrixChunk.setMatrixCelleColor(riga, colonna); */
   }
 }

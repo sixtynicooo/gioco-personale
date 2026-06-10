@@ -26,6 +26,7 @@ export class Chunk {
     private owner: number[][],
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
+    public idChunk:string
   ) {
     this.coordinateGlobalRow = RigheColonne * nchunkRow;
     this.coordinateGlobalCol = RigheColonne * nchunkCol;
@@ -43,10 +44,10 @@ export class Chunk {
       }
     }
     // gestisco ottimizzazioni per risparmiare sprite
-    this.optimizationAll(this.coordinateGlobalRow, this.coordinateGlobalCol);
+    this.optimizationAll();
     world.addChild(this.chunkReder);
   }
-  // verifico se tutto il chunk può essere sostituito con unoo sprite
+  // verifico se tutto il chunk può essere sostituito con uno sprite
   private optimizaAllChunk(): boolean {
     const idOwner: number =
       this.owner[this.RigheColonne * this.nchunkRow][
@@ -66,7 +67,7 @@ export class Chunk {
     return true;
   }
 
-  getmMtrixCelle(riga: number, colonna: number) {
+  getMtrixCelle(riga: number, colonna: number) {
     return this.matrixChunk[riga][colonna];
   }
 
@@ -98,10 +99,10 @@ export class Chunk {
 
   setMatrixCelleColor(riga: number, colonna: number) {
     this.destroySprite();
-    this.optimizationAll(riga, colonna);
+    this.optimizationAll();
   }
 
-  private optimizationAll(riga: number, colonna: number) {
+  private optimizationAll() {
     if (this.optimizaAllChunk()) {
       reuseColorSprite(
         this.coordinateGlobalRow,
@@ -128,7 +129,7 @@ export class Chunk {
   }
 
   // cerco di capire quanti rettangoli si possono usare per ogni riga (ho visto che è rispecchiato con colonne quindi non ha senso fare 2 calcoli)
-  private optimizeLineAllNumber() {
+  public optimizeLineAllNumber() {
     const rowGlobal = this.RigheColonne * this.nchunkRow;
     const colGlobal = this.RigheColonne * this.nchunkCol;
     this.optimizeGreedyNumber(rowGlobal, colGlobal);

@@ -1,6 +1,8 @@
 import { Application, Renderer, Ticker } from 'pixi.js';
 import { World } from './map/world';
 import { Camera } from './map/camera/camera';
+import { DirtyChunk } from '../main';
+import { getRowColId } from '../utility/function-utility';
 
 export class GameMap {
   private world: World;
@@ -12,6 +14,7 @@ export class GameMap {
     private nchunkCol: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
+    private dirtyChunks:Map<string, DirtyChunk>
   ) {
     this.world = new World(
       distanzaWidthHeight,
@@ -20,6 +23,7 @@ export class GameMap {
       nchunkCol,
       app,
       coloriPlayerOwner,
+      dirtyChunks
     );
     this.cameraInstance = new Camera(
       app,
@@ -30,12 +34,23 @@ export class GameMap {
     this.world.addEventClickWord(this.cameraInstance.getViewport());
   }
 
-  updateChunkVisible() {
-    console.log(this.cameraInstance.getViewport().getVisibleBounds());
+  updateChunkDirty() {
+    this.dirtyChunks.forEach((chunkDirty: DirtyChunk,key:string)=>{
+      const chunck=this.world.getMatrixChunk().getMapChunk().get(key)
+      const {riga,colonna}=getRowColId(key)
+      chunck?.setMatrixCelleColor(riga,colonna)
+    })
+
+   
+
+    /* console.log(this.cameraInstance.getViewport().getVisibleBounds());
     console.log();
-    window.screenLeft;
+    window.screenLeft; */
     //console.log(this.cameraInstance.getViewport());
     //console.log(window.innerWidth, window.innerHeight);
     //console.log(this.world.getWorld().getLocalBounds());
+  }
+  clearChunkDirty(){
+    this.dirtyChunks.clear()
   }
 }

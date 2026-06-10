@@ -1,15 +1,26 @@
 import { Application, Renderer, Ticker } from 'pixi.js';
 import { GameMap } from './scenes/game';
 
+type proprietyChunk = 'colorPlayer';
+
+export type DirtyChunk = {
+  colore:boolean
+};
+
 const urlAssetColor = 'src/assets/colorPlayer.json';
 const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 (async () => {
   // prima o poi si dovrà utilizzare chunk
-  const distanzaWidthHeight = 10;
-  const RigheColonne = 32;
-  const nchunkRow = 10;
+  const distanzaWidthHeight = 128;
+  const RigheColonne = 10;
+  const nchunkRow = 4;
   const nchunkCol = nchunkRow;
+  let dirtyChunks = new Map<string, DirtyChunk>();
+
+  const configApp={
+    maxFPS:30
+  }
 
   // recupero colori per le celle
   try {
@@ -24,6 +35,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   (globalThis as any).__PIXI_APP__ = app;
   // Initialize the application
   await app.init({
+    preference: 'webgpu',
     width: distanzaWidthHeight * RigheColonne * nchunkCol,
     height: distanzaWidthHeight * RigheColonne * nchunkRow,
   });
@@ -42,22 +54,22 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
       nchunkCol,
       app,
       coloriPlayerOwner,
+      dirtyChunks
     );
 
-    ticker.add((ticker) => {
-      // logica gioco
-      const a = ticker;
-      //game.updateChunkVisible();
-      //console.log(`Delta Time: ${ticker.deltaTime}`);
+  app.ticker.maxFPS=configApp.maxFPS
+  app.ticker.add((time) => {
+    if(dirtyChunks.size){
+      game.updateChunkDirty();
+      game.clearChunkDirty()
+    }
+      
+      
+    //console.log(time);
+
     });
+
     ticker.start();
-
-    ///////////////////////
-    ///////////////////
-
-    // app.ticker.add((time) => {
-    //   console.log(time);
-    // });
   }
 })();
 
