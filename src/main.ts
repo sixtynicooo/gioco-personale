@@ -1,6 +1,12 @@
 import { Application, Renderer, Ticker } from 'pixi.js';
 import { GameMap } from './scenes/game';
 
+type proprietyChunk = 'colorPlayer';
+
+export type DirtyChunk = {
+  colore:boolean
+};
+
 const urlAssetColor = 'src/assets/colorPlayer.json';
 const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
@@ -11,9 +17,13 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   const RigheColonne = 32;
   const nchunkRow = 10;
   const nchunkCol = nchunkRow;
-  // quanti chunk vedere, da un punto si vedono 2 chunk a sinistra, 2 a destra, 2 su e 2 giù
-  // se 1 vedrò 9 quadranti, con 2 ben 25
-  const nChunkActive = 1;
+
+  let dirtyChunks = new Map<string, DirtyChunk>();
+
+  const configApp={
+    maxFPS:30
+  }
+
 
   // recupero colori per le celle
   try {
@@ -28,6 +38,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   (globalThis as any).__PIXI_APP__ = app;
   // Initialize the application
   await app.init({
+    preference: 'webgpu',
     width: distanzaWidthHeight * RigheColonne * nchunkCol,
     height: distanzaWidthHeight * RigheColonne * nchunkRow,
     preference: 'webgpu', // raccomandato
@@ -48,22 +59,22 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
       nChunkActive,
       app,
       coloriPlayerOwner,
+      dirtyChunks
     );
 
-    ticker.add((ticker) => {
-      // logica gioco
-      const a = ticker;
-      //game.updateChunkVisible();
-      //console.log(`Delta Time: ${ticker.deltaTime}`);
+  app.ticker.maxFPS=configApp.maxFPS
+  app.ticker.add((time) => {
+    if(dirtyChunks.size){
+      game.updateChunkDirty();
+      game.clearChunkDirty()
+    }
+      
+      
+    //console.log(time);
+
     });
+
     ticker.start();
-
-    ///////////////////////
-    ///////////////////
-
-    // app.ticker.add((time) => {
-    //   console.log(time);
-    // });
   }
 })();
 

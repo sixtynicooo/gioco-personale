@@ -8,13 +8,15 @@ import {
 import { Viewport } from 'pixi-viewport';
 import { MapMatrix } from './griglia/chunkMatrix';
 import { DragEvent } from 'pixi-viewport/dist/types';
-import { Camera } from './camera/camera';
-import { Nullable } from '../../model-type/type-utility';
+import { DirtyChunk } from '../../main';
+
+const urlAssetColor = 'src/assets/colorPlayer.json';
 
 export class World {
   private world: Container<ContainerChild>;
   private matrixChunk: MapMatrix;
-  private cameraInstance: Nullable<Camera> = null;
+  // id chunk
+  private chunkid: string[][] = [];
 
   constructor(
     private distanzaWidthHeight: number,
@@ -24,6 +26,7 @@ export class World {
     private nChunkActive: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
+    private dirrtyChunk:Map<string, DirtyChunk>
   ) {
     this.world = new Container({
       width: distanzaWidthHeight * RigheColonne * nchunkCol,
@@ -41,6 +44,7 @@ export class World {
       nChunkActive,
       this.world,
       this.coloriPlayerOwner,
+      this.chunkid
     );
 
     // Center bunny sprite in local container coordinates
@@ -48,38 +52,8 @@ export class World {
     this.world.pivot.y = this.world.height / 2;
 
     this.world.eventMode = 'static';
-    //this.world.position.set(app.screen.width / 2, app.screen.height / 2);
-  }
-
-  // devo gestire correttamente i chunk visibili all'inizio
-  init() {
-    if (this.cameraInstance) {
-      const height = Math.trunc(
-        this.cameraInstance.getViewport().getVisibleBounds().getBounds()
-          .height / 2,
-      );
-      const width = Math.trunc(
-        this.cameraInstance.getViewport().getVisibleBounds().getBounds().width /
-          2,
-      );
-      const wordPosition = this.cameraInstance
-        .getViewport()
-        .toWorld(height, width);
-      const nRowChunk = Math.trunc(
-        height / (this.RigheColonne * this.distanzaWidthHeight),
-      );
-      const nColChunk = Math.trunc(
-        width / (this.RigheColonne * this.distanzaWidthHeight),
-      );
-      console.log(wordPosition);
-      this.cameraInstance.setCenter(width, height);
-      this.matrixChunk.managerActiveChunk(nRowChunk, nColChunk);
-      this.cameraInstance.getViewport().moveCenter(height, width);
-    }
-  }
-
-  public setCameraInstance(cameraInstance: Camera) {
-    this.cameraInstance = cameraInstance;
+    this.world.position.set(app.screen.width / 2, app.screen.height / 2);
+    this.world.position.set(app.screen.width / 2, app.screen.height / 2);
   }
 
   public getWorld() {
@@ -94,21 +68,34 @@ export class World {
       const wordPosition = cameraInstance.toWorld(e.screenX, e.screen.y);
       const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
       const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
-      //console.log(wordPosition, riga, colonna, e);
+      const rowChunk = Math.trunc(riga / this.RigheColonne);
+      const colChunk = Math.trunc(colonna / this.RigheColonne);
+      console.log(wordPosition, riga, colonna);
 
-      this.matrixChunk.setMatrixCelleColor(riga, colonna);
+      console.log('chunkid',this.chunkid,this.chunkid[rowChunk][colChunk])
+      this.updateDirtyChunk(this.chunkid[rowChunk][colChunk],riga,colonna
+      )
+      this.matrixChunk.setMatrixCelleColorNoRendering(riga, colonna);
     });
   }
+
+  private updateDirtyChunk(chunkid:string,riga:number,colonna:number){
+    if(!this.dirrtyChunk.has(chunkid)){
+      this.dirrtyChunk.set(chunkid,{
+        colore:true
+      })
+    }
+  }
+
   public addEventDragDropWord(
     cameraInstance: Viewport,
     screenX: number,
     screenY: number,
   ) {
-    const denominatore = this.distanzaWidthHeight * this.RigheColonne;
-    const wordPosition = cameraInstance.toWorld(screenX, screenY);
-    const riga = Math.trunc(wordPosition.y / denominatore);
-    const colonna = Math.trunc(wordPosition.x / denominatore);
+    /* const wordPosition = cameraInstance.toWorld(screenX, screenY);
+    const riga = Math.trunc(wordPosition.y / this.distanzaWidthHeight);
+    const colonna = Math.trunc(wordPosition.x / this.distanzaWidthHeight);
     console.log(wordPosition, riga, colonna);
-    this.matrixChunk.managerActiveChunk(riga, colonna);
+    this.matrixChunk.setMatrixCelleColor(riga, colonna); */
   }
 }

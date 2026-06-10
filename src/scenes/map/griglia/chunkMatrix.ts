@@ -6,7 +6,7 @@ import {
   creazioneRettangoloReuseSprite,
 } from '../../../utility/create-rectangle';
 import { Chunk } from './chunk';
-import { Viewport } from 'pixi-viewport';
+import { getIdRowCol } from '../../../utility/function-utility';
 
 export class MapMatrix {
   // chi è il proprietario della cella
@@ -17,8 +17,6 @@ export class MapMatrix {
   private chunkRow: number[][] = [];
   // coordinata x del chunk
   private chunkCol: number[][] = [];
-  // id chunk
-  private chunkid: string[][] = [];
   // mappa rendering chunk, se non usato il campo sarà semplicemente null
   private mapChunk = new Map<string, Nullable<Chunk>>();
   private activeChunk = new Map<string, Nullable<Chunk>>();
@@ -31,6 +29,8 @@ export class MapMatrix {
     private nChunkActive: number,
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
+    // id chunk
+    private chunkid: string[][]
   ) {
     for (let i = 0; i < nchunkRow * RigheColonne; i++) {
       this.owner[i] = [];
@@ -63,7 +63,8 @@ export class MapMatrix {
     for (let r = 0; r < this.nchunkRow; r++) {
       this.chunkid[r] = [];
       for (let c = 0; c < this.nchunkCol; c++) {
-        this.chunkid[r][c] = `${r}_${c}`;
+        this.chunkid[r][c] = getIdRowCol(r,c);
+        console.log(r, c);
         this.mapChunk.set(
           this.chunkid[r][c],
           new Chunk(
@@ -74,107 +75,14 @@ export class MapMatrix {
             this.owner,
             world,
             this.coloriPlayerOwner,
-            this.chunkid[r][c],
+            this.chunkid[r][c]
           ),
         );
       }
     }
   }
 
-  public managerActiveChunk(nRowChunk: number, nColChunk: number) {
-    console.log('ciao', nRowChunk, nColChunk, this.mapChunk);
-    const chunksToKeep = new Set<string>();
-    const chunksToRemove = new Set<string>();
-    for (
-      let r = nRowChunk - this.nChunkActive;
-      r <= nRowChunk + this.nChunkActive;
-      r++
-    ) {
-      //console.log('y', r, nRowChunk + this.nChunkActive);
-      if (r >= 0 && r <= this.RigheColonne) {
-        for (
-          let c = nColChunk - this.nChunkActive;
-          c <= nColChunk + this.nChunkActive;
-          c++
-        ) {
-          //console.log('x', c, nColChunk + this.nChunkActive, `${r}_${c}`);
-          if (c >= 0 && c <= this.RigheColonne) {
-            const key = `${r}_${c}`;
-            const chunk = this.mapChunk.get(key);
-            if (chunk) {
-              chunksToKeep.add(key);
-              console.log(key);
-              //this.addChunkActive(chunk, key);
-            } else {
-              chunksToRemove.add(key);
-              //this.removeChunkActive(key);
-            }
-          }
-        }
-      }
-    }
-    // rimuovo quelli necessari e aggiungo quelli necessari
-    // Aggiungo quelli che devono essere attivi ma non lo sono ancora
-    // Aggiungo quelli che devono essere attivi ma non lo sono ancora
-    for (const key of chunksToKeep) {
-      if (!this.activeChunk.has(key)) {
-        const chunk = this.mapChunk.get(key);
-        if (chunk) {
-          this.addChunkActive(chunk, key);
-        }
-      }
-    }
-
-    // Rimuovo quelli che erano attivi ma non devono più esserlo
-    for (const key of this.activeChunk.keys()) {
-      if (!chunksToKeep.has(key)) {
-        // attenzione: controllo su chunksToKeep
-        this.removeChunkActive(key);
-      }
-    }
-
-    // for (
-    //   let r = rowChunk - this.nChunkActive;
-    //   r < rowChunk + this.nChunkActive;
-    //   r++
-    // ) {
-    //   if (r >= 0 && r < rowChunk + this.nChunkActive) {
-    //     for (
-    //       let c = colChunk - this.nChunkActive;
-    //       c < colChunk + this.nChunkActive;
-    //       c++
-    //     ) {
-    //       if (c >= 0 && c < colChunk + this.nChunkActive) {
-    //         const key = `${r}_${c}`;
-    //         const chunk = this.mapChunk.get(key);
-    //         if (chunk) {
-    //           console.log(key);
-    //           this.addChunkActive(chunk, key);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // this.cameraInstance.getViewport().moveCenter(height, width);
-  }
-
-  private addChunkActive(chunk: Chunk, key: string) {
-    chunk.setChunkActive();
-    this.activeChunk.set(key, chunk);
-  }
-
-  private removeChunkActive(key: string) {
-    const chunk = this.mapChunk.get(key);
-    if (!chunk) {
-      return;
-    }
-    chunk.setChunkDelete();
-    if (this.activeChunk.has(key)) {
-      this.activeChunk.delete(key);
-    }
-  }
-
-  public setMatrixCelleColor(row: number, col: number) {
+  public setMatrixCelleColorNoRendering(row: number, col: number) {
     const rowChunk = Math.trunc(row / this.RigheColonne);
     const colChunk = Math.trunc(col / this.RigheColonne);
     const rowRelativeChunk = row % this.RigheColonne;
@@ -182,7 +90,7 @@ export class MapMatrix {
     const matrixRednder: Nullable<Chunk> | undefined = this.mapChunk.get(
       this.chunkid[rowChunk][colChunk],
     );
-    console.log(this.owner[row][col]);
+    //console.log(this.owner[row][col]);
     if (this.owner[row][col] === -1) {
       return;
     }
@@ -190,9 +98,7 @@ export class MapMatrix {
       this.owner[row][col] === 1
         ? (this.owner[row][col] = 10)
         : (this.owner[row][col] = 1);
-    if (matrixRednder) {
-      matrixRednder.setMatrixCelleColor(rowRelativeChunk, colRelativeChunk);
-    }
+    // il rendering va fatto durante l'aggiornamento tick, al momento aggiorno tutto il chunk sfruttando id
   }
 
   getChunkRowCol(rigaGlobale: number, colonnaGlobale: number) {
@@ -203,5 +109,9 @@ export class MapMatrix {
       col: col,
       idChunk: this.chunkid[row][col],
     };
+  }
+
+  public getMapChunk(): Map<string, Nullable<Chunk>> {
+    return this.mapChunk;
   }
 }

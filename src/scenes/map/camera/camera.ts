@@ -46,11 +46,11 @@ export class Camera {
       })
       .pinch({ percent: 1 }); // supporto touch
 
-    // aggiungo eventi drag drop
-    this.viewport.on('drag-end', (e: DragEvent) => {
+    // aggiungo eventi drag drop tolto in quanto al momento non mi serve
+    /* this.viewport.on('drag-end', (e: DragEvent) => {
       this.world.addEventDragDropWord(this.viewport, e.screen.x, e.screen.y);
       console.log(e);
-    });
+    }); */
     // aggiungiamo il viewport al stage principale
     this.viewport.addChild(world.getWorld());
     app.stage.addChild(this.viewport);
