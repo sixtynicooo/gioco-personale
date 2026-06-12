@@ -15,7 +15,7 @@ export class GameMap {
     private nChunkActive: number,
     private app: Application<Renderer>,
     private coloriPlayerOwner: Map<number, string>,
-    private dirtyChunks:Map<string, DirtyChunk>
+    private dirtyChunks: Map<string, DirtyChunk>,
   ) {
     this.world = new World(
       distanzaWidthHeight,
@@ -25,7 +25,7 @@ export class GameMap {
       nChunkActive,
       app,
       coloriPlayerOwner,
-      dirtyChunks
+      dirtyChunks,
     );
     this.cameraInstance = new Camera(
       app,
@@ -34,18 +34,14 @@ export class GameMap {
       this.world,
     );
     this.world.addEventClickWord(this.cameraInstance.getViewport());
-    this.world.setCameraInstance(this.cameraInstance);
-    this.world.init();
   }
 
   updateChunkDirty() {
-    this.dirtyChunks.forEach((chunkDirty: DirtyChunk,key:string)=>{
-      const chunck=this.world.getMatrixChunk().getMapChunk().get(key)
-      const {riga,colonna}=getRowColId(key)
-      chunck?.setMatrixCelleColor(riga,colonna)
-    })
-
-   
+    this.dirtyChunks.forEach((chunkDirty: DirtyChunk, key: string) => {
+      const chunck = this.world.getMatrixChunk().getMapChunk().get(key);
+      const { riga, colonna } = getRowColId(key);
+      chunck?.setMatrixCelleColor(riga, colonna);
+    });
 
     /* console.log(this.cameraInstance.getViewport().getVisibleBounds());
     console.log();
@@ -54,7 +50,7 @@ export class GameMap {
     //console.log(window.innerWidth, window.innerHeight);
     //console.log(this.world.getWorld().getLocalBounds());
   }
-  clearChunkDirty(){
-    this.dirtyChunks.clear()
+  clearChunkDirty() {
+    this.dirtyChunks.clear();
   }
 }

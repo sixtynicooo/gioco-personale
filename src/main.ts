@@ -4,7 +4,7 @@ import { GameMap } from './scenes/game';
 type proprietyChunk = 'colorPlayer';
 
 export type DirtyChunk = {
-  colore:boolean
+  colore: boolean;
 };
 
 const urlAssetColor = 'src/assets/colorPlayer.json';
@@ -12,18 +12,16 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 (async () => {
   // prima o poi si dovrà utilizzare chunk
-  // max 10 chunk per lato
   const distanzaWidthHeight = 10;
   const RigheColonne = 32;
   const nchunkRow = 10;
   const nchunkCol = nchunkRow;
-
   let dirtyChunks = new Map<string, DirtyChunk>();
+  let nChunkActive = 1;
 
-  const configApp={
-    maxFPS:30
-  }
-
+  const configApp = {
+    maxFPS: 30,
+  };
 
   // recupero colori per le celle
   try {
@@ -41,7 +39,6 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
     preference: 'webgpu',
     width: distanzaWidthHeight * RigheColonne * nchunkCol,
     height: distanzaWidthHeight * RigheColonne * nchunkRow,
-    preference: 'webgpu', // raccomandato
   });
 
   // Append the application canvas to the document body
@@ -59,19 +56,17 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
       nChunkActive,
       app,
       coloriPlayerOwner,
-      dirtyChunks
+      dirtyChunks,
     );
 
-  app.ticker.maxFPS=configApp.maxFPS
-  app.ticker.add((time) => {
-    if(dirtyChunks.size){
-      game.updateChunkDirty();
-      game.clearChunkDirty()
-    }
-      
-      
-    //console.log(time);
+    app.ticker.maxFPS = configApp.maxFPS;
+    app.ticker.add((time) => {
+      if (dirtyChunks.size) {
+        game.updateChunkDirty();
+        game.clearChunkDirty();
+      }
 
+      //console.log(time);
     });
 
     ticker.start();
