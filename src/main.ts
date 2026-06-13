@@ -5,23 +5,33 @@ type proprietyChunk = 'colorPlayer';
 
 export type DirtyChunk = {
   colore: boolean;
+  visible:boolean
 };
 
 const urlAssetColor = 'src/assets/colorPlayer.json';
 const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
-(async () => {
-  // prima o poi si dovrà utilizzare chunk
-  const distanzaWidthHeight = 10;
-  const RigheColonne = 32;
-  const nchunkRow = 10;
-  const nchunkCol = nchunkRow;
-  let dirtyChunks = new Map<string, DirtyChunk>();
-  let nChunkActive = 1;
+export const configMap={
+    cells:{
+      cellSize:10,
+    },
+    chunk:{
+      size:32,
+      chunkRows:10,
+      chunkCols:10,
+      activeRadius:1
+    }
+    
+}
 
-  const configApp = {
+const configApp = {
     maxFPS: 30,
   };
+
+(async () => {
+  let dirtyChunks = new Map<string, DirtyChunk>();
+
+
 
   // recupero colori per le celle
   try {
@@ -37,8 +47,8 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   // Initialize the application
   await app.init({
     preference: 'webgpu',
-    width: distanzaWidthHeight * RigheColonne * nchunkCol,
-    height: distanzaWidthHeight * RigheColonne * nchunkRow,
+    width: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkCols,
+    height: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkRows,
   });
 
   // Append the application canvas to the document body
@@ -49,11 +59,6 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
     ticker.minFPS = 30;
 
     const game = new GameMap(
-      distanzaWidthHeight,
-      RigheColonne,
-      nchunkRow,
-      nchunkCol,
-      nChunkActive,
       app,
       coloriPlayerOwner,
       dirtyChunks,
@@ -61,7 +66,13 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
     app.ticker.maxFPS = configApp.maxFPS;
     app.ticker.add((time) => {
+      // aggiorno chunk visibili e quindi dirtyChunks (decido se rendere visibile o invisibile)
+      game.updateVisibleChunk()
+
+
       if (dirtyChunks.size) {
+        console.log(dirtyChunks)
+
         game.updateChunkDirty();
         game.clearChunkDirty();
       }
@@ -73,25 +84,6 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
   }
 })();
 
-//   private async loadColorPlayer() {
-//     try {
-//       const response = await fetch(urlAssetColor, {
-//         method: 'GET',
-//       });
-//       if (!response.ok) throw new Error('Errore caricamento JSON colori');
-//       // TS sa che tutte le chiavi sono string e i valori string
-//       const colorPlayer: Record<string, string> = await response.json();
-//       for (const key in colorPlayer) {
-//         const keyNumber = Number(key);
-//         this.coloriPlayerOwner.set(keyNumber, colorPlayer[keyNumber]);
-//       }
-//       console.log();
-//     } catch (err) {
-//       console.error('Errore caricamento colori:', err);
-//     }
-//   }
-// }
-//
 function loadColorPlayer(): Promise<Map<number, string>> {
   return new Promise(async (resolve, reject) => {
     try {

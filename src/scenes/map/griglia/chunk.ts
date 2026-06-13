@@ -6,6 +6,7 @@ import {
   reuseColorSprite,
 } from '../../../utility/create-rectangle';
 import { Nullable } from '../../../model-type/type-utility';
+import { configMap } from '../../../main';
 
 export type cellChunk = {
   colorPlayer: Nullable<Sprite>;
@@ -17,28 +18,28 @@ export class Chunk {
   private chunkReder: Container<ContainerChild>;
   private coordinateGlobalRow: number;
   private coordinateGlobalCol: number;
+  private readonly cellSize: number=configMap.cells.cellSize
+  private readonly size: number=configMap.chunk.size
   // visibile o meno questo chunk, basta togliere il suo chunkReder dal world
   public visible: boolean = false;
 
   constructor(
-    private distanzaWidthHeight: number,
-    private RigheColonne: number,
-    private nchunkRow: number,
-    private nchunkCol: number,
+    private relativeChunkRow: number,
+    private relativeChunkCol: number,
     private owner: number[][],
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
     public idChunk:string
   ) {
-    this.coordinateGlobalRow = RigheColonne * nchunkRow;
-    this.coordinateGlobalCol = RigheColonne * nchunkCol;
+    this.coordinateGlobalRow = this.size * relativeChunkRow;
+    this.coordinateGlobalCol = this.size * relativeChunkCol;
     this.chunkReder = new Container();
-    this.chunkReder.width = distanzaWidthHeight * RigheColonne;
-    this.chunkReder.height = distanzaWidthHeight * RigheColonne;
+    this.chunkReder.width = this.cellSize * this.size;
+    this.chunkReder.height = this.cellSize * this.size;
 
-    for (let i = 0; i < RigheColonne; i++) {
+    for (let i = 0; i < this.size; i++) {
       this.matrixChunk[i] = [];
-      for (let j = 0; j < RigheColonne; j++) {
+      for (let j = 0; j < this.size; j++) {
         this.matrixChunk[i][j] = {
           colorPlayer: null,
           border: null,
@@ -52,14 +53,14 @@ export class Chunk {
   // verifico se tutto il chunk può essere sostituito con uno sprite
   private optimizaAllChunk(): boolean {
     const idOwner: number =
-      this.owner[this.RigheColonne * this.nchunkRow][
-        this.RigheColonne * this.nchunkCol
+      this.owner[this.size * this.relativeChunkRow][
+        this.size * this.relativeChunkCol
       ];
-    for (let i = 0; i < this.RigheColonne; i++) {
-      for (let j = 0; j < this.RigheColonne; j++) {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
         const correntIdOwner =
-          this.owner[this.RigheColonne * this.nchunkRow + i][
-            this.RigheColonne * this.nchunkCol + j
+          this.owner[this.size * this.relativeChunkRow + i][
+            this.size * this.relativeChunkCol + j
           ];
         if (idOwner !== correntIdOwner) {
           return false;
@@ -78,9 +79,13 @@ export class Chunk {
     this.allNullSprite();
   }
 
+  public hideChunk(){
+    this.destroySprite()
+  }
+
   private allNullSprite() {
-    for (let i = 0; i < this.RigheColonne; i++) {
-      for (let j = 0; j < this.RigheColonne; j++) {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
         this.matrixChunk[i][j].colorPlayer?.destroy();
         this.matrixChunk[i][j].colorPlayer = null;
       }
@@ -99,7 +104,7 @@ export class Chunk {
     }
   }
 
-  setMatrixCelleColor(riga: number, colonna: number) {
+  setMatrixCelleColor() {
     this.destroySprite();
     this.optimizationAll();
   }
@@ -111,12 +116,12 @@ export class Chunk {
         this.coordinateGlobalCol,
         0,
         0,
-        this.distanzaWidthHeight,
-        this.RigheColonne,
-        this.nchunkRow,
-        this.nchunkCol,
-        this.distanzaWidthHeight * this.RigheColonne,
-        this.distanzaWidthHeight * this.RigheColonne,
+        this.cellSize,
+        this.size,
+        this.relativeChunkRow,
+        this.relativeChunkCol,
+        this.cellSize * this.size,
+        this.cellSize * this.size,
         this.coloriPlayerOwner.get(
           this.owner[this.coordinateGlobalRow][this.coordinateGlobalCol],
         ),
@@ -124,8 +129,6 @@ export class Chunk {
         this.chunkReder,
       );
       this.addSpriteContainer(this.matrixChunk[0][0].colorPlayer);
-      console.log(this.matrixChunk[0][0]);
-      console.log(this.matrixChunk[0][0]);
     } else {
       this.optimizeLineAllNumber();
     }
@@ -133,24 +136,24 @@ export class Chunk {
 
   // cerco di capire quanti rettangoli si possono usare per ogni riga (ho visto che è rispecchiato con colonne quindi non ha senso fare 2 calcoli)
   public optimizeLineAllNumber() {
-    const rowGlobal = this.RigheColonne * this.nchunkRow;
-    const colGlobal = this.RigheColonne * this.nchunkCol;
+    const rowGlobal = this.size * this.relativeChunkRow;
+    const colGlobal = this.size * this.relativeChunkCol;
     this.optimizeGreedyNumber(rowGlobal, colGlobal);
-    // for (let row = 0; row < this.RigheColonne; row++) {
+    // for (let row = 0; row < this.size; row++) {
     //   this.optimizeRowNumber(rowGlobal, colGlobal, row, bg);
     // }
   }
 
   // tecnica greedy per diminuire velocemente sprite
   private optimizeGreedyNumber(rowGlobal: number, colGlobal: number) {
-    const used = Array.from({ length: this.RigheColonne }, () =>
-      Array(this.RigheColonne).fill(false),
+    const used = Array.from({ length: this.size }, () =>
+      Array(this.size).fill(false),
     );
 
-    const cellSize = this.distanzaWidthHeight;
+    const cellSize = this.cellSize;
 
-    for (let row = 0; row < this.RigheColonne; row++) {
-      for (let col = 0; col < this.RigheColonne; col++) {
+    for (let row = 0; row < this.size; row++) {
+      for (let col = 0; col < this.size; col++) {
         // già visitato
         if (used[row][col]) {
           continue;
@@ -167,7 +170,7 @@ export class Chunk {
         // scansiono la lunghezza tenendo conto stesso owner
         let widthCells = 0;
         while (
-          col + widthCells < this.RigheColonne &&
+          col + widthCells < this.size &&
           !used[row][col + widthCells] &&
           this.owner[gRow][colGlobal + col + widthCells] === owner
         ) {
@@ -178,7 +181,7 @@ export class Chunk {
         let heightCells = 1;
         let canGrow = true;
 
-        while (canGrow && row + heightCells < this.RigheColonne) {
+        while (canGrow && row + heightCells < this.size) {
           for (let x = 0; x < widthCells; x++) {
             if (
               used[row + heightCells][col + x] ||
@@ -206,10 +209,10 @@ export class Chunk {
           this.coordinateGlobalCol,
           row,
           col,
-          this.distanzaWidthHeight,
-          this.RigheColonne,
-          this.nchunkRow,
-          this.nchunkCol,
+          this.cellSize,
+          this.size,
+          this.relativeChunkRow,
+          this.relativeChunkCol,
           widthCells * cellSize,
           heightCells * cellSize,
           this.coloriPlayerOwner.get(
@@ -226,78 +229,16 @@ export class Chunk {
     }
   }
 
-  // private optimizeRowNumber(
-  //   rowGlobal: number,
-  //   colGlobal: number,
-  //   row: number,
-  //   bg: string,
-  // ) {
-  //   let lastOwner = this.owner[rowGlobal + row][colGlobal];
-  //   let current = this.owner[rowGlobal + row][colGlobal];
-  //   let colStart = 0;
-  //   let width = this.distanzaWidthHeight;
-  //   for (let col = 0; col < this.RigheColonne; col++) {
-  //     current = this.owner[rowGlobal + row][colGlobal + col];
-  //     if (current !== lastOwner) {
-  //       console.log(row, colStart, width, this.distanzaWidthHeight, true, bg);
-  //       // reuseColorSprite(
-  //       //   width - this.distanzaWidthHeight,
-  //       //   this.distanzaWidthHeight,
-  //       //   true,
-  //       //   lastOwner === 1 ? 'blue' : 'red',
-  //       //   this.matrixChunk[row][colStart].colorPlayer,
-  //       // );
+    public setChunkActive() {
+    this.world.addChild(this.chunkReder);
+    this.optimizationAll();
+    this.visible = true;
+    //console.log(this.world.children);
+  }
 
-  //       reuseColorSprite(
-  //         this.coordinateGlobalRow,
-  //         this.coordinateGlobalCol,
-  //         row,
-  //         col,
-  //         this.distanzaWidthHeight,
-  //         this.RigheColonne,
-  //         this.nchunkRow,
-  //         this.nchunkCol,
-  //         width - this.distanzaWidthHeight,
-  //         this.distanzaWidthHeight,
-  //         lastOwner === 1 ? 'blue' : 'red',
-  //         this.matrixChunk,
-  //         this.world
-  //       );
-
-  //       this.addSpriteContainer(this.matrixChunk[row][colStart].colorPlayer);
-  //       width = this.distanzaWidthHeight;
-  //       colStart = col;
-  //       lastOwner = current;
-  //       console.log('fattoooo');
-  //     } else if (col === this.RigheColonne - 1) {
-  //       // reuseColorSprite(
-  //       //   width,
-  //       //   this.distanzaWidthHeight,
-  //       //   true,
-  //       //   lastOwner === 1 ? 'blue' : 'red',
-  //       //   this.matrixChunk[row][colStart].colorPlayer,
-  //       // );
-
-  //       reuseColorSprite(
-  //         this.coordinateGlobalRow,
-  //         this.coordinateGlobalCol,
-  //         row,
-  //         col,
-  //         this.distanzaWidthHeight,
-  //         this.RigheColonne,
-  //         this.nchunkRow,
-  //         this.nchunkCol,
-  //         width,
-  //         this.distanzaWidthHeight,
-  //         lastOwner === 1 ? 'blue' : 'red',
-  //         this.matrixChunk,
-  //         this.world
-  //       );
-
-  //       console.log('fattoooo111');
-  //       this.addSpriteContainer(this.matrixChunk[row][colStart].colorPlayer);
-  //     }
-  //     width += this.distanzaWidthHeight;
-  //   }
-  // }
+  public setChunkDelete() {
+    this.destroySprite();
+    this.world.removeChild(this.chunkReder);
+    this.visible = false;
+  }
 }

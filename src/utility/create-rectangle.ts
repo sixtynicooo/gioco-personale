@@ -4,10 +4,10 @@ import { cellChunk } from '../scenes/map/griglia/chunk';
 export const createBorderGraphic = (
   riga: number,
   colonna: number,
-  distanzaWidthHeight: number,
-  nchunkRow: number,
-  nchunkCol: number,
-  RigheColonne: number,
+  cellSize: number,
+  chunkRows: number,
+  chunkCols: number,
+  size: number,
   borderColor: string,
   visible: boolean,
   zIndex: number,
@@ -17,11 +17,11 @@ export const createBorderGraphic = (
   left: boolean,
 ): Graphics => {
   const x =
-    colonna * distanzaWidthHeight +
-    nchunkCol * RigheColonne * distanzaWidthHeight;
+    colonna * cellSize +
+    chunkCols * size * cellSize;
   const y =
-    riga * distanzaWidthHeight + nchunkRow * RigheColonne * distanzaWidthHeight;
-  const s = distanzaWidthHeight;
+    riga * cellSize + chunkRows * size * cellSize;
+  const s = cellSize;
 
   const border = new Graphics();
 
@@ -64,10 +64,10 @@ export const creazioneRettangoloReuseGraph = (
 export const createColorSprite = (
   riga: number,
   colonna: number,
-  distanzaWidthHeight: number,
-  nchunkRow: number,
-  nchunkCol: number,
-  RigheColonne: number,
+  cellSize: number,
+  chunkRows: number,
+  chunkCols: number,
+  size: number,
   width: number,
   height: number,
   color: string | undefined,
@@ -75,13 +75,13 @@ export const createColorSprite = (
   zIndex: number,
 ) => {
   const rect = new Sprite(Texture.WHITE);
-  // rect.x = colonna * distanzaWidthHeight;
-  // rect.y = riga * distanzaWidthHeight;
+  // rect.x = colonna * cellSize;
+  // rect.y = riga * cellSize;
   rect.x =
-    colonna * distanzaWidthHeight +
-    nchunkCol * RigheColonne * distanzaWidthHeight;
+    colonna * cellSize +
+    chunkCols * size * cellSize;
   rect.y =
-    riga * distanzaWidthHeight + nchunkRow * RigheColonne * distanzaWidthHeight;
+    riga * cellSize + chunkRows * size * cellSize;
   rect.width = width;
   rect.height = height;
   rect.tint = color ?? '#000000';
@@ -97,10 +97,10 @@ export const reuseColorSprite = (
   colGlobal: number,
   rowRelative: number,
   colRelative: number,
-  distanzaWidthHeight: number,
-  RigheColonne: number,
-  nchunkRow: number,
-  nchunkCol: number,
+  cellSize: number,
+  size: number,
+  chunkRows: number,
+  chunkCols: number,
   width: number,
   height: number,
   color: string | undefined,
@@ -116,10 +116,10 @@ export const reuseColorSprite = (
     const rect: Sprite = createColorSprite(
       rowRelative,
       colRelative,
-      distanzaWidthHeight,
-      nchunkRow,
-      nchunkCol,
-      RigheColonne,
+      cellSize,
+      chunkRows,
+      chunkCols,
+      size,
       width,
       height,
       color,

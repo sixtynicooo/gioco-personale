@@ -7,8 +7,15 @@ import {
 } from '../../../utility/create-rectangle';
 import { Chunk } from './chunk';
 import { getIdRowCol } from '../../../utility/function-utility';
+import { configMap } from '../../../main';
 
 export class MapMatrix {
+  private readonly cellSize: number=configMap.cells.cellSize
+  private readonly size: number=configMap.chunk.size
+  private readonly chunkRows: number=configMap.chunk.chunkRows
+  private readonly chunkCols: number=configMap.chunk.chunkCols
+  private readonly activeRadius: number=configMap.chunk.activeRadius
+
   // chi è il proprietario della cella
   private owner: number[][] = [];
   // tipo cella
@@ -22,29 +29,24 @@ export class MapMatrix {
   private activeChunk = new Map<string, Nullable<Chunk>>();
 
   constructor(
-    private distanzaWidthHeight: number,
-    private RigheColonne: number,
-    private nchunkRow: number,
-    private nchunkCol: number,
-    private nChunkActive: number,
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
     // id chunk
     private chunkid: string[][]
   ) {
-    for (let i = 0; i < nchunkRow * RigheColonne; i++) {
+    for (let i = 0; i < this.chunkRows * this.size; i++) {
       this.owner[i] = [];
       this.typeCell[i] = [];
       this.chunkRow[i] = [];
       this.chunkCol[i] = [];
       // this.colorPlayer[i] = [];
       // this.border[i] = [];
-      for (let j = 0; j < nchunkCol * RigheColonne; j++) {
+      for (let j = 0; j < this.chunkCols * this.size; j++) {
         if (
           i === 0 ||
-          i === nchunkRow * RigheColonne - 1 ||
+          i === this.chunkRows * this.size - 1 ||
           j === 0 ||
-          j === nchunkCol * RigheColonne - 1
+          j === this.chunkCols * this.size - 1
         ) {
           this.owner[i][j] = -1;
         } else {
@@ -52,24 +54,22 @@ export class MapMatrix {
         }
         //this.owner[i][j] = 1;
         this.typeCell[i][j] = -1;
-        const chunkR = Math.floor(i / this.RigheColonne);
-        const chunkC = Math.floor(j / this.RigheColonne);
+        const chunkR = Math.floor(i / this.size);
+        const chunkC = Math.floor(j / this.size);
 
         this.chunkRow[i][j] = chunkR;
         this.chunkCol[i][j] = chunkC;
       }
     }
     // creo matrice id chunk qui
-    for (let r = 0; r < this.nchunkRow; r++) {
+    for (let r = 0; r < this.chunkRows; r++) {
       this.chunkid[r] = [];
-      for (let c = 0; c < this.nchunkCol; c++) {
+      for (let c = 0; c < this.chunkCols; c++) {
         this.chunkid[r][c] = getIdRowCol(r,c);
         console.log(r, c);
         this.mapChunk.set(
           this.chunkid[r][c],
           new Chunk(
-            distanzaWidthHeight,
-            RigheColonne,
             r,
             c,
             this.owner,
@@ -83,10 +83,10 @@ export class MapMatrix {
   }
 
   public setMatrixCelleColorNoRendering(row: number, col: number) {
-    const rowChunk = Math.trunc(row / this.RigheColonne);
-    const colChunk = Math.trunc(col / this.RigheColonne);
-    const rowRelativeChunk = row % this.RigheColonne;
-    const colRelativeChunk = col % this.RigheColonne;
+    const rowChunk = Math.trunc(row / this.size);
+    const colChunk = Math.trunc(col / this.size);
+    const rowRelativeChunk = row % this.size;
+    const colRelativeChunk = col % this.size;
     const matrixRednder: Nullable<Chunk> | undefined = this.mapChunk.get(
       this.chunkid[rowChunk][colChunk],
     );
@@ -114,4 +114,100 @@ export class MapMatrix {
   public getMapChunk(): Map<string, Nullable<Chunk>> {
     return this.mapChunk;
   }
+
+  public getActiveChunk(): Map<string, Nullable<Chunk>> {
+    return this.activeChunk;
+  }
+
+  public managerActiveChunk(rowCurrentChunk: number, colCurrentChunk: number) {
+    console.log('ciao', rowCurrentChunk, colCurrentChunk, this.mapChunk);
+    const chunksToKeep = new Set<string>();
+    const chunksToRemove = new Set<string>();
+    for (
+      let r = rowCurrentChunk - this.activeRadius;
+      r <= rowCurrentChunk + this.activeRadius;
+      r++
+    ) {
+      //console.log('y', r, rowCurrentChunk + this.activeRadius);
+      if (r >= 0 && r <= this.size) {
+        for (
+          let c = colCurrentChunk - this.activeRadius;
+          c <= colCurrentChunk + this.activeRadius;
+          c++
+        ) {
+          if (c >= 0 && c <= this.size) {
+            const key =getIdRowCol(r,c)
+            const chunk = this.mapChunk.get(key);
+            if (chunk) {
+              chunksToKeep.add(key);
+              console.log(key);
+              //this.addChunkActive(chunk, key);
+            } else {
+              chunksToRemove.add(key);
+              //this.removeChunkActive(key);
+            }
+          }
+        }
+      }
+    }
+    // rimuovo quelli necessari e aggiungo quelli necessari
+    // Aggiungo quelli che devono essere attivi ma non lo sono ancora
+    for (const key of chunksToKeep) {
+      if (!this.activeChunk.has(key)) {
+        const chunk = this.mapChunk.get(key);
+        if (chunk) {
+          this.addChunkActive(chunk, key);
+        }
+      }
+    }
+
+    // Rimuovo quelli che erano attivi ma non devono più esserlo
+    for (const key of this.activeChunk.keys()) {
+      if (!chunksToKeep.has(key)) {
+        // attenzione: controllo su chunksToKeep
+        this.removeChunkActive(key);
+      }
+    }
+
+    // for (
+    //   let r = rowChunk - this.activeRadius;
+    //   r < rowChunk + this.activeRadius;
+    //   r++
+    // ) {
+    //   if (r >= 0 && r < rowChunk + this.activeRadius) {
+    //     for (
+    //       let c = colChunk - this.activeRadius;
+    //       c < colChunk + this.activeRadius;
+    //       c++
+    //     ) {
+    //       if (c >= 0 && c < colChunk + this.activeRadius) {
+    //         const key = `${r}_${c}`;
+    //         const chunk = this.mapChunk.get(key);
+    //         if (chunk) {
+    //           console.log(key);
+    //           this.addChunkActive(chunk, key);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // this.cameraInstance.getViewport().moveCenter(height, width);
+  }
+
+  private addChunkActive(chunk: Chunk, key: string) {
+    chunk.setChunkActive();
+    this.activeChunk.set(key, chunk);
+  }
+
+  private removeChunkActive(key: string) {
+    const chunk = this.mapChunk.get(key);
+    if (!chunk) {
+      return;
+    }
+    chunk.setChunkDelete();
+    if (this.activeChunk.has(key)) {
+      this.activeChunk.delete(key);
+    }
+  }
+  
 }

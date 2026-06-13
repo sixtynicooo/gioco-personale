@@ -2,22 +2,24 @@ import { Drag, Viewport } from 'pixi-viewport';
 import { Application, Renderer } from 'pixi.js';
 import { World } from '../world';
 import { DragEvent } from 'pixi-viewport/dist/types';
+import { Nullable } from '../../../model-type/type-utility';
+import { configMap } from '../../../main';
 
 // https://viewport.pixijs.io/ e https://github.com/pixijs-userland/pixi-viewport
 export class Camera {
   private viewport: Viewport;
-  private dragPoint: any;
+  //private dragPoint: any;
+    private readonly cellSize: number=configMap.cells.cellSize
+  private readonly size: number=configMap.chunk.size
   constructor(
     private app: Application<Renderer>,
-    private distanzaWidthHeight: number,
-    private RigheColonne: number,
     private world: World,
   ) {
     this.viewport = new Viewport({
       screenWidth: app.screen.width,
       screenHeight: app.screen.height,
-      worldWidth: distanzaWidthHeight * RigheColonne,
-      worldHeight: distanzaWidthHeight * RigheColonne,
+      worldWidth: this.cellSize * this.size,
+      worldHeight: this.cellSize * this.size,
       events: app.renderer.events,
     });
     // abilitiamo funzionalità interattive
@@ -32,7 +34,7 @@ export class Camera {
     //     minHeight: this.app.screen.height * 0.1,
     //     maxWidth: worldTmp.getWorld().width, // massimo zoom: larghezza del mondo
     //     maxHeight: worldTmp.getWorld().height, // altezza massima
-    //     // maxHeight: this.distanzaWidthHeight * this.RigheColonne, // altezza massima
+    //     // maxHeight: this.cellSize * this.size, // altezza massima
     //   })
     //   .pinch({ percent: 1 });
     // Forza la camera all'angolo in alto a sinistra del mondo
@@ -47,10 +49,23 @@ export class Camera {
       .pinch({ percent: 1 }); // supporto touch
 
     // aggiungo eventi drag drop tolto in quanto al momento non mi serve
-    /* this.viewport.on('drag-end', (e: DragEvent) => {
-      this.world.addEventDragDropWord(this.viewport, e.screen.x, e.screen.y);
+    /* this.viewport.on('moveed', (e) => {
+      //this.world.addEventDragDropWord(this.viewport, e.screen.x, e.screen.y);
       console.log(e);
-    }); */
+    });  */
+
+      /* this.viewport.on("zoomed-end", (e) => {
+        console.log('zoom',e)
+      }); */
+      
+      /* this.viewport.on("moved-end", (e) => {
+        console.log('moved-end',e)
+      }); */
+      
+      /* this.viewport.on("moved", (e) => {
+        console.log('moved',e)
+      }); */
+
     // aggiungiamo il viewport al stage principale
     this.viewport.addChild(world.getWorld());
     app.stage.addChild(this.viewport);
@@ -64,6 +79,8 @@ export class Camera {
     this.viewport.moveCenter(width, height);
     console.log(width, height, this.viewport.center);
   }
+
+
 
   // onDragStart = (event: any) => {
   //   event.stopPropagation();
