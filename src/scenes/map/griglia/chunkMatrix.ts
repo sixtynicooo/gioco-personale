@@ -66,7 +66,6 @@ export class MapMatrix {
       this.chunkid[r] = [];
       for (let c = 0; c < this.chunkCols; c++) {
         this.chunkid[r][c] = getIdRowCol(r,c);
-        console.log(r, c);
         this.mapChunk.set(
           this.chunkid[r][c],
           new Chunk(
@@ -117,81 +116,6 @@ export class MapMatrix {
 
   public getActiveChunk(): Map<string, Nullable<Chunk>> {
     return this.activeChunk;
-  }
-
-  public managerActiveChunk(rowCurrentChunk: number, colCurrentChunk: number) {
-    console.log('ciao', rowCurrentChunk, colCurrentChunk, this.mapChunk);
-    const chunksToKeep = new Set<string>();
-    const chunksToRemove = new Set<string>();
-    for (
-      let r = rowCurrentChunk - this.activeRadius;
-      r <= rowCurrentChunk + this.activeRadius;
-      r++
-    ) {
-      //console.log('y', r, rowCurrentChunk + this.activeRadius);
-      if (r >= 0 && r <= this.size) {
-        for (
-          let c = colCurrentChunk - this.activeRadius;
-          c <= colCurrentChunk + this.activeRadius;
-          c++
-        ) {
-          if (c >= 0 && c <= this.size) {
-            const key =getIdRowCol(r,c)
-            const chunk = this.mapChunk.get(key);
-            if (chunk) {
-              chunksToKeep.add(key);
-              console.log(key);
-              //this.addChunkActive(chunk, key);
-            } else {
-              chunksToRemove.add(key);
-              //this.removeChunkActive(key);
-            }
-          }
-        }
-      }
-    }
-    // rimuovo quelli necessari e aggiungo quelli necessari
-    // Aggiungo quelli che devono essere attivi ma non lo sono ancora
-    for (const key of chunksToKeep) {
-      if (!this.activeChunk.has(key)) {
-        const chunk = this.mapChunk.get(key);
-        if (chunk) {
-          this.addChunkActive(chunk, key);
-        }
-      }
-    }
-
-    // Rimuovo quelli che erano attivi ma non devono più esserlo
-    for (const key of this.activeChunk.keys()) {
-      if (!chunksToKeep.has(key)) {
-        // attenzione: controllo su chunksToKeep
-        this.removeChunkActive(key);
-      }
-    }
-
-    // for (
-    //   let r = rowChunk - this.activeRadius;
-    //   r < rowChunk + this.activeRadius;
-    //   r++
-    // ) {
-    //   if (r >= 0 && r < rowChunk + this.activeRadius) {
-    //     for (
-    //       let c = colChunk - this.activeRadius;
-    //       c < colChunk + this.activeRadius;
-    //       c++
-    //     ) {
-    //       if (c >= 0 && c < colChunk + this.activeRadius) {
-    //         const key = `${r}_${c}`;
-    //         const chunk = this.mapChunk.get(key);
-    //         if (chunk) {
-    //           console.log(key);
-    //           this.addChunkActive(chunk, key);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // this.cameraInstance.getViewport().moveCenter(height, width);
   }
 
   private addChunkActive(chunk: Chunk, key: string) {

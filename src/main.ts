@@ -13,13 +13,13 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 export const configMap={
     cells:{
-      cellSize:10,
+      cellSize:64,
     },
     chunk:{
-      size:32,
-      chunkRows:10,
-      chunkCols:10,
-      activeRadius:1
+      size:10,
+      chunkRows:100,
+      chunkCols:100,
+      activeRadius:2
     }
     
 }
@@ -44,11 +44,12 @@ const configApp = {
   const app: Application<Renderer> = new Application();
 
   (globalThis as any).__PIXI_APP__ = app;
-  // Initialize the application
+  // Initialize the application, IMPORTANTE la grandezza non può essere troppo grande altrimenti errore
   await app.init({
     preference: 'webgpu',
-    width: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkCols,
-    height: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkRows,
+    // niente dimensione
+    //width: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkCols,
+    //height: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkRows,
   });
 
   // Append the application canvas to the document body
@@ -65,13 +66,12 @@ const configApp = {
     );
 
     app.ticker.maxFPS = configApp.maxFPS;
+    
     app.ticker.add((time) => {
       // aggiorno chunk visibili e quindi dirtyChunks (decido se rendere visibile o invisibile)
       game.updateVisibleChunk()
-
-
       if (dirtyChunks.size) {
-        console.log(dirtyChunks)
+        //console.log(dirtyChunks.size)
 
         game.updateChunkDirty();
         game.clearChunkDirty();

@@ -30,9 +30,11 @@ export class Chunk {
     private world: Container<ContainerChild>,
     private coloriPlayerOwner: Map<number, string>,
     public idChunk:string
+
   ) {
     this.coordinateGlobalRow = this.size * relativeChunkRow;
     this.coordinateGlobalCol = this.size * relativeChunkCol;
+    console.log(' this.size', this.size,relativeChunkRow)
     this.chunkReder = new Container();
     this.chunkReder.width = this.cellSize * this.size;
     this.chunkReder.height = this.cellSize * this.size;
@@ -46,9 +48,6 @@ export class Chunk {
         };
       }
     }
-    // gestisco ottimizzazioni per risparmiare sprite
-    this.optimizationAll();
-    world.addChild(this.chunkReder);
   }
   // verifico se tutto il chunk può essere sostituito con uno sprite
   private optimizaAllChunk(): boolean {
@@ -80,7 +79,7 @@ export class Chunk {
   }
 
   public hideChunk(){
-    this.destroySprite()
+    this.allNullSprite()
   }
 
   private allNullSprite() {
@@ -105,11 +104,13 @@ export class Chunk {
   }
 
   setMatrixCelleColor() {
+    this.world.addChild(this.chunkReder)
     this.destroySprite();
     this.optimizationAll();
   }
 
   private optimizationAll() {
+     
     if (this.optimizaAllChunk()) {
       reuseColorSprite(
         this.coordinateGlobalRow,

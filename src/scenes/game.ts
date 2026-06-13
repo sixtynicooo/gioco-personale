@@ -40,15 +40,19 @@ export class GameMap {
 
   // controllo solo parte visibile
   updateChunkDirty() {
-    console.log('quiiiiiii')
+   // console.log('quiiiiiii')
     this.dirtyChunks.forEach((chunkDirty: DirtyChunk, key: string) => {
-      const chunck = this.world.getMatrixChunk().getActiveChunk().get(key);
-      console.log(key,chunkDirty)
+      const chunck = this.world.getMatrixChunk().getActiveChunk().get(key)??this.world.getMatrixChunk().getMapChunk().get(key);
+
+      //console.log(key,chunkDirty,chunck)
       if(!chunkDirty.visible && chunck){
         // elimino dal rendering
-        chunck.hideChunk()
+        chunck.setChunkDelete()
+      }else if(chunkDirty.visible && chunck){
+        //console.log('quiiiiiiiiiii22222222',chunck)
+        chunck.setMatrixCelleColor();
       }
-      chunck?.setMatrixCelleColor();
+      
     });
 
     /* console.log(this.cameraInstance.getViewport().getVisibleBounds());
@@ -69,45 +73,46 @@ export class GameMap {
 
     let centerRow = Math.trunc(y / chunkSize);
     let centerCol = Math.trunc(x / chunkSize);
+    
     const key=getIdRowColRadius(centerRow,centerCol,this.activeRadius)
     
+
+
     this.getChunkCenter(centerRow,centerCol,key)
+   // console.log(this.getChunkCenter(centerRow,centerCol,key), this.dirtyChunks)
     // aggiorno dirtyChunks con chunk corretti
-    const newVisibleChunks=this.cacheVisibleChunks.get(key)
-    const oldVisibleChunks=this.cacheVisibleChunks.get(this.oldVisibleChunks)
-    if(oldVisibleChunks && newVisibleChunks){
-      // elimino chunk non visibili
-      for (const id of oldVisibleChunks) {
-        if (!newVisibleChunks.has(id) && this.dirtyChunks.has(id)) {
-          this.dirtyChunks.set(id,{
-            visible:false,
-            colore:false
-          })
-        }
-          
-      }
-      // aggiungo chunk visibili
-      for (const id of newVisibleChunks) {
-        if (!oldVisibleChunks.has(id) && !this.dirtyChunks.has(id)) {
-          // nuovo chunk visibile
-          this.dirtyChunks.set(id,{
-            visible:true,
-            colore:true
-          })
-        }
-      }
-        
+    const newVisibleChunks=this.cacheVisibleChunks.get(key) ?? new Set<string>();
+    const oldVisibleChunks=this.cacheVisibleChunks.get(this.oldVisibleChunks) ?? new Set<string>();
+    
+    
 
-
-    // copio id corrente che sarà il precedente al prossimo controllo
-    this.oldVisibleChunks=getIdRowColRadius(centerRow,centerCol,this.activeRadius)
+  // elimino chunk non visibili
+  for (const id of oldVisibleChunks) {
+    if (!newVisibleChunks.has(id)) {
+      this.dirtyChunks.set(id, {
+        visible: false,
+        colore: false
+      });
     }
+  }
+
+  // aggiungo chunk
+  for (const id of newVisibleChunks) {
+    if (!oldVisibleChunks.has(id)) {
+      this.dirtyChunks.set(id, {
+        visible: true,
+        colore: true
+      });
+    }
+  }
+  // copio id corrente che sarà il precedente al prossimo controllo
+  this.oldVisibleChunks=getIdRowColRadius(centerRow,centerCol,this.activeRadius)
   }
   private getChunkCenter(centerRow:number,centerCol:number,key:string){
     
     // controllo se già presente nella cache ciò che serve
-    if(!this.cacheVisibleChunks.has(key)){
-      return
+    if(this.cacheVisibleChunks.has(key)){
+      return this.cacheVisibleChunks.get(key)
     }
     const maxRow = this.chunkRows - 1;
     const maxCol = this.chunkCols - 1;
@@ -126,34 +131,34 @@ export class GameMap {
 
     // shift ai bordi (versione semplice e corretta)
     if (startRow < 0) {
-      endRow += -startRow;
       startRow = 0;
+      
     }
 
     if (endRow > maxRow) {
-      startRow -= (endRow - maxRow);
       endRow = maxRow;
     }
 
     if (startCol < 0) {
-      endCol += -startCol;
       startCol = 0;
     }
 
     if (endCol > maxCol) {
-      startCol -= (endCol - maxCol);
       endCol = maxCol;
+      
     }
+    
     let idChunkSet:Set<string>=new Set<string>()
     for (let row = startRow; row <= endRow; row++) {
       for (let col = startCol; col <= endCol; col++) {
         // qui dentro hai ogni cella/chunk
-        console.log(row, col);
+        //console.log(row, col);
         idChunkSet.add(getIdRowCol(row,col))
       }
     }
     // salvo nella cache il valore
     this.cacheVisibleChunks.set(key,idChunkSet)
+    return this.cacheVisibleChunks.get(key)
 
   }
 }
