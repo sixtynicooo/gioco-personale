@@ -45,13 +45,14 @@ export class World {
       this.coloriPlayerOwner,
       this.chunkid
     );
-
+    
     // Center bunny sprite in local container coordinates
     this.world.pivot.x = this.world.width / 2;
     this.world.pivot.y = this.world.height / 2;
 
-    this.world.eventMode = 'static';
-    this.world.position.set(0, 0);
+    this.world.eventMode = 'dynamic';
+
+    //this.world.position.set(0, 0);
   }
 
   // devo gestire correttamente i chunk visibili all'inizio
@@ -91,72 +92,30 @@ export class World {
 
   console.log("INIT CENTER:", { centerX, centerY, id,rowCurrentChunk,colCurrentChunk });
 } */
-  init() {
+  init(rowCunkInit:number,colCunkInit:number) {
     if (!this.cameraInstance) {
       return
     }
-      const height = Math.trunc(
-        this.cameraInstance.getViewport().getVisibleBounds().getBounds()
-          .height / 2,
-      );
-      const width = Math.trunc(
-        this.cameraInstance.getViewport().getVisibleBounds().getBounds().width /
-          2,
-      );
-      const wordPosition = this.cameraInstance
-        .getViewport()
-        .toWorld(height, width);
-      const rowCurrentChunk = Math.trunc(
-        height / (this.size * this.cellSize),
-      );
-      const colCurrentChunk = Math.trunc(
-        width / (this.size * this.cellSize),
-      );
-      //console.log(wordPosition);
-      //this.cameraInstance.getViewport().moveCorner(0,0)
-      //this.cameraInstance.setCenter(width, height);
-     // this.cameraInstance.getViewport().fit();
-      //this.cameraInstance.getViewport().moveCenter(height, width);
+      const addMeta= (this.size * this.cellSize)*0.5
+      const heightCurrentChunk =
+        this.size * this.cellSize*rowCunkInit+addMeta
+      const widthCurrentChunk = 
+        this.size * this.cellSize*colCunkInit+addMeta
      
-      console.log( this.cameraInstance.getViewport().toGlobal(this.world))
-
-      this.dirtyChunk.set(getIdRowCol(0,0),{
+      console.log( 'init addMeta',addMeta,heightCurrentChunk,widthCurrentChunk)
+      console.log( 'init heightCurrentChunk',rowCunkInit)
+      console.log( 'init widthCurrentChunk',colCunkInit)
+      console.log( 'init widthCurrentChunk',colCunkInit)
+      console.log( 'init this.chunkid[rowChunk][colChunk]',this.chunkid[rowCunkInit][colCunkInit])
+      // attenzione che qui prima width che sono le colonne in un certo senso
+      this.cameraInstance.getViewport().moveCenter(widthCurrentChunk,heightCurrentChunk);
+      this.dirtyChunk.set(getIdRowCol(rowCunkInit,colCunkInit),{
         colore:true,
         visible:true
       })
   }
-  /* init() {
-    if (this.cameraInstance) {
-      const height = Math.trunc(
-        this.cameraInstance.getViewport().getVisibleBounds().getBounds()
-          .height / 2,
-      );
-      const width = Math.trunc(
-        this.cameraInstance.getViewport().getVisibleBounds().getBounds().width /
-          2,
-      );
-      const wordPosition = this.cameraInstance
-        .getViewport()
-        .toWorld(height, width);
-      const rowCurrentChunk = Math.trunc(
-        height / (this.size * this.cellSize),
-      );
-      const colCurrentChunk = Math.trunc(
-        width / (this.size * this.cellSize),
-      );
-      console.log(wordPosition);
-      //this.cameraInstance.setCenter(width, height);
-      this.cameraInstance.getViewport().fit();
-      this.cameraInstance.getViewport().moveCenter(height, width);
 
-      this.dirtyChunk.set(getIdRowCol(rowCurrentChunk,colCurrentChunk),{
-        colore:true,
-        visible:true
-      })
-    }
-  } */
-
-    public setCameraInstance(cameraInstance: Camera) {
+  public setCameraInstance(cameraInstance: Camera) {
     this.cameraInstance = cameraInstance;
   }
 
@@ -166,58 +125,19 @@ export class World {
   public getMatrixChunk() {
     return this.matrixChunk;
   }
-  // aggiungo evento che trasforma le coordinate
-  /* public addEventClickWord(cameraInstance: Viewport) {
 
-  this.world.on('click', (e: FederatedPointerEvent) => {
-
-    // 1. SCREEN → WORLD (CORRETTO)
-    const worldPosition = cameraInstance.toWorld(
-      e.screen.x,
-      e.screen.y
-    );
-
-    // DEBUG
-    console.log("WORLD CLICK:", worldPosition);
-
-    // 2. WORLD → CELL
-    const cellX = Math.floor(worldPosition.x / this.cellSize);
-    const cellY = Math.floor(worldPosition.y / this.cellSize);
-
-    // 3. CELL → CHUNK
-    const rowChunk = Math.floor(cellY / this.size);
-    const colChunk = Math.floor(cellX / this.size);
-
-    const chunkId =
-      this.chunkid?.[rowChunk]?.[colChunk];
-
-    console.log("CHUNK:", {
-      rowChunk,
-      colChunk,
-      chunkId
-    });
-
-    if (!chunkId) return;
-
-    this.updateDirtyChunk(chunkId);
-
-    this.matrixChunk.setMatrixCelleColorNoRendering(
-      cellY,
-      cellX
-    );
-  });
-} */
   public addEventClickWord(cameraInstance: Viewport) {
     this.world.on('click', (e: FederatedPointerEvent) => {
       const wordPosition = cameraInstance.toWorld(e.screenX, e.screen.y);
-      console.log( 'cameraInstance',e,wordPosition,e.screen)
+      //console.log( 'cameraInstance',e,wordPosition,e.screen)
       const riga = Math.trunc(wordPosition.y / this.cellSize);
       const colonna = Math.trunc(wordPosition.x / this.cellSize);
       const rowChunk = Math.trunc(riga / this.size);
       const colChunk = Math.trunc(colonna / this.size);
-      console.log('x,y',wordPosition)
+      //console.log('x,y',wordPosition)
       //console.log(wordPosition, riga, colonna);
-      console.log('chunkid',this.chunkid,this.chunkid[rowChunk][colChunk],rowChunk,colChunk)
+      //console.log('chunkid',this.chunkid,this.chunkid[rowChunk][colChunk],rowChunk,colChunk)
+      console.log('chunkid',this.chunkid[rowChunk][colChunk],rowChunk,colChunk)
       this.updateDirtyChunk(this.chunkid[rowChunk][colChunk]
       )
       this.matrixChunk.setMatrixCelleColorNoRendering(riga, colonna);

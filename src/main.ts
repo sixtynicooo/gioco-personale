@@ -13,13 +13,15 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 export const configMap={
     cells:{
+      // linghezza e alttezza celle px
       cellSize:64,
     },
     chunk:{
-      size:10,
+      // 
+      size:16,
       chunkRows:100,
       chunkCols:100,
-      activeRadius:2
+      activeRadius:5
     }
     
 }
@@ -30,6 +32,9 @@ const configApp = {
 
 (async () => {
   let dirtyChunks = new Map<string, DirtyChunk>();
+
+  const rowCunkInit:number=0
+  const colCunkInit:number=0
 
 
 
@@ -50,6 +55,8 @@ const configApp = {
     // niente dimensione
     //width: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkCols,
     //height: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkRows,
+    width: window.innerWidth,
+    height: window.innerHeight,
   });
 
   // Append the application canvas to the document body
@@ -63,6 +70,8 @@ const configApp = {
       app,
       coloriPlayerOwner,
       dirtyChunks,
+      rowCunkInit,
+      colCunkInit
     );
 
     app.ticker.maxFPS = configApp.maxFPS;
@@ -76,8 +85,6 @@ const configApp = {
         game.updateChunkDirty();
         game.clearChunkDirty();
       }
-
-      //console.log(time);
     });
 
     ticker.start();
@@ -94,8 +101,6 @@ function loadColorPlayer(): Promise<Map<number, string>> {
       for (const key in colorPlayer) {
         coloriPlayerOwner.set(Number(key), colorPlayer[key]);
       }
-
-      console.log('Colori caricati:', coloriPlayerOwner);
       resolve(coloriPlayerOwner);
     } catch (err) {
       console.error('Errore caricamento colori:', err);

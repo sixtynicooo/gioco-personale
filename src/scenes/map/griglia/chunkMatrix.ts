@@ -1,10 +1,5 @@
 import { Container, ContainerChild, Graphics, Sprite } from 'pixi.js';
 import { Nullable } from '../../../model-type/type-utility';
-import {
-  createBorderGraphic,
-  createColorSprite,
-  creazioneRettangoloReuseSprite,
-} from '../../../utility/create-rectangle';
 import { Chunk } from './chunk';
 import { getIdRowCol } from '../../../utility/function-utility';
 import { configMap } from '../../../main';

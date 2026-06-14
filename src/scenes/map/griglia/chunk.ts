@@ -1,8 +1,5 @@
 import { Container, ContainerChild, Graphics, Sprite, Texture } from 'pixi.js';
 import {
-  createBorderGraphic,
-  createColorSprite,
-  creazioneRettangoloReuseSprite,
   reuseColorSprite,
 } from '../../../utility/create-rectangle';
 import { Nullable } from '../../../model-type/type-utility';
@@ -34,7 +31,6 @@ export class Chunk {
   ) {
     this.coordinateGlobalRow = this.size * relativeChunkRow;
     this.coordinateGlobalCol = this.size * relativeChunkCol;
-    console.log(' this.size', this.size,relativeChunkRow)
     this.chunkReder = new Container();
     this.chunkReder.width = this.cellSize * this.size;
     this.chunkReder.height = this.cellSize * this.size;
@@ -76,10 +72,6 @@ export class Chunk {
   private destroySprite() {
     this.removeChildrenContiner();
     this.allNullSprite();
-  }
-
-  public hideChunk(){
-    this.allNullSprite()
   }
 
   private allNullSprite() {
@@ -140,9 +132,6 @@ export class Chunk {
     const rowGlobal = this.size * this.relativeChunkRow;
     const colGlobal = this.size * this.relativeChunkCol;
     this.optimizeGreedyNumber(rowGlobal, colGlobal);
-    // for (let row = 0; row < this.size; row++) {
-    //   this.optimizeRowNumber(rowGlobal, colGlobal, row, bg);
-    // }
   }
 
   // tecnica greedy per diminuire velocemente sprite
