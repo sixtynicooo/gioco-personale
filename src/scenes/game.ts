@@ -60,6 +60,10 @@ export class GameMap {
   clearChunkDirty() {
     this.dirtyChunks.clear();
   }
+  
+  getCameraInstance() {
+    return this.cameraInstance
+  }
 
   updateVisibleChunk(){
     const { x, y } = this.cameraInstance.getViewport().center;
@@ -116,24 +120,28 @@ export class GameMap {
     let startCol = centerCol - r;
     let endCol = centerCol + r;
 
-    // shift ai bordi (versione semplice e corretta)
+    // shift ai bordi , tiene conto anche dei bordi che non debba perdere chunk
     if (startRow < 0) {
+      endRow += -startRow;
       startRow = 0;
-      
     }
 
     if (endRow > maxRow) {
+      startRow -= (endRow - maxRow);
       endRow = maxRow;
     }
 
     if (startCol < 0) {
+      endCol += -startCol;
       startCol = 0;
     }
 
     if (endCol > maxCol) {
+      startCol -= (endCol - maxCol);
       endCol = maxCol;
-      
     }
+    startRow = Math.max(0, startRow);
+    startCol = Math.max(0, startCol);
     
     let idChunkSet:Set<string>=new Set<string>()
     for (let row = startRow; row <= endRow; row++) {

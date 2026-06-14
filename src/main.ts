@@ -13,23 +13,31 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 
 export const configMap={
     cells:{
-      // linghezza e alttezza celle px
+      // lunghezza e alttezza celle px
       cellSize:64,
     },
     chunk:{
-      // 
-      size:16,
+      // righe e colonne di un chunk
+      size:32,
+      // quanti chunk sono in una riga
       chunkRows:100,
+      // quanti chunk sono in una colonna
       chunkCols:100,
+      // quanti chunk sono visibili da in mezzo di un chunk
+      /* 
+      Esempio con 5 chunk attivi a destra e sinistra, poi la stessa cosa sopra e sotto
+      *****x*****
+      */
       activeRadius:5
     }
     
 }
 
 const configApp = {
-    maxFPS: 30,
+    maxFPS: 60,
   };
 
+  // TODO quando elimino e chiudo app devo eliminare alcuni eventi. Al momento non ho ancora deciso come fare perchè non ho bisogno ma metto qui gli eventi necessari da eliminare
 (async () => {
   let dirtyChunks = new Map<string, DirtyChunk>();
 
@@ -52,12 +60,10 @@ const configApp = {
   // Initialize the application, IMPORTANTE la grandezza non può essere troppo grande altrimenti errore
   await app.init({
     preference: 'webgpu',
-    // niente dimensione
-    //width: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkCols,
-    //height: configMap.cells.cellSize * configMap.chunk.size * configMap.chunk.chunkRows,
     width: window.innerWidth,
     height: window.innerHeight,
-  });
+    resolution: window.devicePixelRatio
+});
 
   // Append the application canvas to the document body
   const pixiContainer = document.getElementById('pixi-container');
@@ -88,7 +94,12 @@ const configApp = {
     });
 
     ticker.start();
+
+    // quando elimino e chiudo app devo eliminare alcuni eventi. Al momento non ho ancora deciso come fare perchè non ho bisogno ma metto qui gli eventi necessari da eliminare
+    //game?.getCameraInstance().destroy()
   }
+
+  
 })();
 
 function loadColorPlayer(): Promise<Map<number, string>> {

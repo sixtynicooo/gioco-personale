@@ -101,12 +101,6 @@ export class World {
         this.size * this.cellSize*rowCunkInit+addMeta
       const widthCurrentChunk = 
         this.size * this.cellSize*colCunkInit+addMeta
-     
-      console.log( 'init addMeta',addMeta,heightCurrentChunk,widthCurrentChunk)
-      console.log( 'init heightCurrentChunk',rowCunkInit)
-      console.log( 'init widthCurrentChunk',colCunkInit)
-      console.log( 'init widthCurrentChunk',colCunkInit)
-      console.log( 'init this.chunkid[rowChunk][colChunk]',this.chunkid[rowCunkInit][colCunkInit])
       // attenzione che qui prima width che sono le colonne in un certo senso
       this.cameraInstance.getViewport().moveCenter(widthCurrentChunk,heightCurrentChunk);
       this.dirtyChunk.set(getIdRowCol(rowCunkInit,colCunkInit),{
@@ -134,9 +128,6 @@ export class World {
       const colonna = Math.trunc(wordPosition.x / this.cellSize);
       const rowChunk = Math.trunc(riga / this.size);
       const colChunk = Math.trunc(colonna / this.size);
-      //console.log('x,y',wordPosition)
-      //console.log(wordPosition, riga, colonna);
-      //console.log('chunkid',this.chunkid,this.chunkid[rowChunk][colChunk],rowChunk,colChunk)
       console.log('chunkid',this.chunkid[rowChunk][colChunk],rowChunk,colChunk)
       this.updateDirtyChunk(this.chunkid[rowChunk][colChunk]
       )

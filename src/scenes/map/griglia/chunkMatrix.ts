@@ -77,14 +77,6 @@ export class MapMatrix {
   }
 
   public setMatrixCelleColorNoRendering(row: number, col: number) {
-    const rowChunk = Math.trunc(row / this.size);
-    const colChunk = Math.trunc(col / this.size);
-    const rowRelativeChunk = row % this.size;
-    const colRelativeChunk = col % this.size;
-    const matrixRednder: Nullable<Chunk> | undefined = this.mapChunk.get(
-      this.chunkid[rowChunk][colChunk],
-    );
-    //console.log(this.owner[row][col]);
     if (this.owner[row][col] === -1) {
       return;
     }

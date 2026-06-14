@@ -18,8 +18,8 @@ export class Camera {
     this.viewport = new Viewport({
       screenWidth: app.screen.width,
       screenHeight: app.screen.height,
-      worldWidth: this.cellSize * this.size,
-      worldHeight: this.cellSize * this.size,
+     // worldWidth: this.cellSize * this.size,
+     // worldHeight: this.cellSize * this.size,
       events: app.renderer.events,
     });
     // abilitiamo funzionalità interattive
@@ -46,7 +46,21 @@ export class Camera {
         percent: 0.05, // velocità dello zoom con rotellina
         smooth: 3, // opzionale, rende lo zoom più fluido
       })
-      .pinch({ percent: 1 }); // supporto touch
+      .pinch({ percent: 1 }) // supporto touch
+      .clampZoom({
+         minWidth: this.app.screen.width * 0.1, // non zoomare troppo fuori
+         minHeight: this.app.screen.height * 0.1,
+         maxWidth: this.app.screen.width *15,
+          maxHeight: this.app.screen.height *15,
+         /* maxWidth: this.app.screen.width *12,
+          maxHeight: this.app.screen.height *12, */
+
+         /*  maxScale:30,
+          minScale:0.1 */
+
+
+         // maxHeight: this.cellSize * this.size, // altezza massima
+       })
 
     // aggiungo eventi drag drop tolto in quanto al momento non mi serve
     /* this.viewport.on('moveed', (e) => {
@@ -69,7 +83,25 @@ export class Camera {
     // aggiungiamo il viewport al stage principale
     this.viewport.addChild(world.getWorld());
     app.stage.addChild(this.viewport);
+    window.addEventListener('resize', this.onResize);
+
   }
+
+  public destroy() {
+    window.removeEventListener('resize', this.onResize);
+    this.viewport.destroy();
+  }
+
+  // aggiungo evento a window
+  private onResize = () => {
+  this.app.renderer.resize(window.innerWidth, window.innerHeight);
+
+  this.viewport.screenWidth = window.innerWidth;
+  this.viewport.screenHeight = window.innerHeight;
+
+  this.viewport.resize(window.innerWidth, window.innerHeight);
+};
+  
 
   public getViewport() {
     return this.viewport;
