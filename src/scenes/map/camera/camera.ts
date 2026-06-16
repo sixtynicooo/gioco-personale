@@ -50,8 +50,9 @@ export class Camera {
       .clampZoom({
          minWidth: this.app.screen.width * 0.1, // non zoomare troppo fuori
          minHeight: this.app.screen.height * 0.1,
-         maxWidth: this.app.screen.width *15,
-          maxHeight: this.app.screen.height *15,
+         // FUNZIONA limitare zoom
+         //maxWidth: this.app.screen.width *15,
+          //maxHeight: this.app.screen.height *15,
          /* maxWidth: this.app.screen.width *12,
           maxHeight: this.app.screen.height *12, */
 

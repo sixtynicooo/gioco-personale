@@ -14,7 +14,7 @@ const coloriPlayerOwner: Map<number, string> = new Map<number, string>();
 export const configMap={
     cells:{
       // lunghezza e alttezza celle px
-      cellSize:64,
+      cellSize:128,
     },
     chunk:{
       // righe e colonne di un chunk
