@@ -1,5 +1,6 @@
 import { Application, Renderer, Ticker } from 'pixi.js';
 import { GameMap } from './scenes/game';
+import { SpritePool } from './utility/sprite-pool-manager';
 
 type proprietyChunk = 'colorPlayer';
 
@@ -18,20 +19,24 @@ export const configMap={
     },
     chunk:{
       // righe e colonne di un chunk
-      size:32,
+      size:64,
       // quanti chunk sono in una riga
-      chunkRows:100,
+      chunkRows:30,
       // quanti chunk sono in una colonna
-      chunkCols:100,
+      chunkCols:30,
       // quanti chunk sono visibili da in mezzo di un chunk
       /* 
       Esempio con 5 chunk attivi a destra e sinistra, poi la stessa cosa sopra e sotto
       *****x*****
       */
       activeRadius:5
-    }
-    
+    },
 }
+
+export const pool={
+      maxSprite:1000,
+      controlTick:100
+    }
 
 const configApp = {
     maxFPS: 60,
@@ -40,6 +45,8 @@ const configApp = {
   // TODO quando elimino e chiudo app devo eliminare alcuni eventi. Al momento non ho ancora deciso come fare perchè non ho bisogno ma metto qui gli eventi necessari da eliminare
 (async () => {
   let dirtyChunks = new Map<string, DirtyChunk>();
+  let spritePoolManager = SpritePool.getInstance();
+  spritePoolManager.init(pool.maxSprite)
 
   const rowCunkInit:number=0
   const colCunkInit:number=0
@@ -81,8 +88,11 @@ const configApp = {
     );
 
     app.ticker.maxFPS = configApp.maxFPS;
+    // faccio cose in modo periodico
+    let ntick:number=0
     
     app.ticker.add((time) => {
+      ntick++
       // aggiorno chunk visibili e quindi dirtyChunks (decido se rendere visibile o invisibile)
       game.updateVisibleChunk()
       if (dirtyChunks.size) {
@@ -90,6 +100,11 @@ const configApp = {
 
         game.updateChunkDirty();
         game.clearChunkDirty();
+        // console.log(spritePoolManager.debug())
+      }
+      if(ntick%pool.controlTick===0){
+        spritePoolManager.controlMaxPool()
+         //console.log(ntick)
       }
     });
 

@@ -44,14 +44,12 @@ export class GameMap {
   updateChunkDirty() {
    // console.log('quiiiiiii')
     this.dirtyChunks.forEach((chunkDirty: DirtyChunk, key: string) => {
-      const chunck = this.world.getMatrixChunk().getActiveChunk().get(key)??this.world.getMatrixChunk().getMapChunk().get(key);
+      const chunck =this.world.getMatrixChunk().getMapChunk().get(key);
 
-      //console.log(key,chunkDirty,chunck)
       if(!chunkDirty.visible && chunck){
         // elimino dal rendering
         chunck.setChunkDelete()
       }else if(chunkDirty.visible && chunck){
-        //console.log('quiiiiiiiiiii22222222',chunck)
         chunck.setMatrixCelleColor();
       }
       

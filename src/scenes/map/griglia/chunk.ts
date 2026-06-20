@@ -3,15 +3,10 @@ import {
   reuseColorSprite,
 } from '../../../utility/create-rectangle';
 import { Nullable } from '../../../model-type/type-utility';
-import { configMap } from '../../../main';
-
-export type cellChunk = {
-  colorPlayer: Nullable<Sprite>;
-  border: Nullable<Graphics>;
-};
+import { configMap, pool } from '../../../main';
+import { SpritePool } from '../../../utility/sprite-pool-manager';
 
 export class Chunk {
-  private matrixChunk: cellChunk[][] = [];
   private chunkReder: Container<ContainerChild>;
   private coordinateGlobalRow: number;
   private coordinateGlobalCol: number;
@@ -19,6 +14,8 @@ export class Chunk {
   private readonly size: number=configMap.chunk.size
   // visibile o meno questo chunk, basta togliere il suo chunkReder dal world
   public visible: boolean = false;
+  private readonly spritePoolManager = SpritePool.getInstance();
+  private activeSpriteColor:Sprite[]=[]
 
   constructor(
     private relativeChunkRow: number,
@@ -34,39 +31,6 @@ export class Chunk {
     this.chunkReder = new Container();
     this.chunkReder.width = this.cellSize * this.size;
     this.chunkReder.height = this.cellSize * this.size;
-
-    for (let i = 0; i < this.size; i++) {
-      this.matrixChunk[i] = [];
-      for (let j = 0; j < this.size; j++) {
-        this.matrixChunk[i][j] = {
-          colorPlayer: null,
-          border: null,
-        };
-      }
-    }
-  }
-  // verifico se tutto il chunk può essere sostituito con uno sprite
-  private optimizaAllChunk(): boolean {
-    const idOwner: number =
-      this.owner[this.size * this.relativeChunkRow][
-        this.size * this.relativeChunkCol
-      ];
-    for (let i = 0; i < this.size; i++) {
-      for (let j = 0; j < this.size; j++) {
-        const correntIdOwner =
-          this.owner[this.size * this.relativeChunkRow + i][
-            this.size * this.relativeChunkCol + j
-          ];
-        if (idOwner !== correntIdOwner) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  getMtrixCelle(riga: number, colonna: number) {
-    return this.matrixChunk[riga][colonna];
   }
 
   private destroySprite() {
@@ -75,56 +39,32 @@ export class Chunk {
   }
 
   private allNullSprite() {
-    for (let i = 0; i < this.size; i++) {
-      for (let j = 0; j < this.size; j++) {
-        this.matrixChunk[i][j].colorPlayer?.destroy();
-        this.matrixChunk[i][j].colorPlayer = null;
-      }
-    }
+    this.activeSpriteColor.forEach((activeSprite)=>{
+      this.spritePoolManager.release(activeSprite)
+    })
+     this.activeSpriteColor=[]
   }
 
   // invalido e tolgo tutti gli sprite
   private removeChildrenContiner() {
-    while (this.chunkReder.children.length > 0) {
-      this.chunkReder.removeChildren(0);
-    }
+    this.chunkReder.removeChildren()
   }
   private addSpriteContainer(sprite: Nullable<Sprite>) {
     if (sprite) {
       this.chunkReder.addChild(sprite);
+      this.activeSpriteColor.push(sprite)
     }
   }
 
   setMatrixCelleColor() {
     this.world.addChild(this.chunkReder)
+    this.chunkReder.visible=true
     this.destroySprite();
     this.optimizationAll();
   }
 
   private optimizationAll() {
-     
-    if (this.optimizaAllChunk()) {
-      reuseColorSprite(
-        this.coordinateGlobalRow,
-        this.coordinateGlobalCol,
-        0,
-        0,
-        this.cellSize,
-        this.size,
-        this.relativeChunkRow,
-        this.relativeChunkCol,
-        this.cellSize * this.size,
-        this.cellSize * this.size,
-        this.coloriPlayerOwner.get(
-          this.owner[this.coordinateGlobalRow][this.coordinateGlobalCol],
-        ),
-        this.matrixChunk,
-        this.chunkReder,
-      );
-      this.addSpriteContainer(this.matrixChunk[0][0].colorPlayer);
-    } else {
-      this.optimizeLineAllNumber();
-    }
+     this.optimizeLineAllNumber();
   }
 
   // cerco di capire quanti rettangoli si possono usare per ogni riga (ho visto che è rispecchiato con colonne quindi non ha senso fare 2 calcoli)
@@ -194,7 +134,7 @@ export class Chunk {
           }
         }
 
-        reuseColorSprite(
+        const sprite=reuseColorSprite(
           this.coordinateGlobalRow,
           this.coordinateGlobalCol,
           row,
@@ -210,11 +150,10 @@ export class Chunk {
               this.coordinateGlobalCol + col
             ],
           ),
-          this.matrixChunk,
           this.chunkReder,
         );
 
-        this.addSpriteContainer(this.matrixChunk[row][col].colorPlayer);
+        this.addSpriteContainer(sprite);
       }
     }
   }

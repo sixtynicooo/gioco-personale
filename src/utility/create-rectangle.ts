@@ -1,7 +1,10 @@
 import { Container, ContainerChild, Graphics, Sprite, Texture } from 'pixi.js';
-import { cellChunk } from '../scenes/map/griglia/chunk';
+import { SpritePool } from './sprite-pool-manager';
+import { pool } from '../main';
 
-export const createBorderGraphic = (
+const spritePoolManager = SpritePool.getInstance();
+
+/* export const createBorderGraphic = (
   riga: number,
   colonna: number,
   cellSize: number,
@@ -48,10 +51,10 @@ export const createBorderGraphic = (
   border.visible = visible;
   border.zIndex = zIndex;
   return border;
-};
+}; */
 
 // usato per cambiare colori e altro, riutilizzo Graphics senza ricrearlo
-export const creazioneRettangoloReuseGraph = (
+/* export const creazioneRettangoloReuseGraph = (
   bg: string,
   graphics: Graphics,
 ) => {
@@ -59,9 +62,9 @@ export const creazioneRettangoloReuseGraph = (
     .fill(bg)
     .stroke({ width: 1, color: '#FF0000', pixelLine: true });
   return rect;
-};
+}; */
 
-export const createColorSprite = (
+/* export const createColorSprite = (
   riga: number,
   colonna: number,
   cellSize: number,
@@ -74,7 +77,7 @@ export const createColorSprite = (
   alpha: number,
   zIndex: number,
 ) => {
-  const rect = new Sprite(Texture.WHITE);
+  const rect =spritePoolManager.get();
   // rect.x = colonna * cellSize;
   // rect.y = riga * cellSize;
   rect.x =
@@ -89,7 +92,7 @@ export const createColorSprite = (
   rect.zIndex = zIndex;
   rect.visible = true;
   return rect;
-};
+}; */
 
 // crea o riusa sprite
 export const reuseColorSprite = (
@@ -104,39 +107,22 @@ export const reuseColorSprite = (
   width: number,
   height: number,
   color: string | undefined,
-  matrixChunk: cellChunk[][],
   chunkReder: Container<ContainerChild>,
 ) => {
-  if (matrixChunk[rowRelative][colRelative].colorPlayer) {
-    const rect = matrixChunk[rowRelative][colRelative].colorPlayer;
-    rect.width = width;
-    rect.height = height;
-    rect.tint = color ?? '#000000';
-  } else {
-    const rect: Sprite = createColorSprite(
-      rowRelative,
-      colRelative,
-      cellSize,
-      chunkRows,
-      chunkCols,
-      size,
-      width,
-      height,
-      color,
-      0.7,
-      0,
-    );
-    chunkReder.addChild(rect);
-    matrixChunk[rowRelative][colRelative].colorPlayer = rect;
-  }
-};
-
-export const creazioneRettangoloReuseSprite = (
-  bg: string,
-  chunk: cellChunk,
-) => {
-  console.log(chunk);
-  if (chunk.colorPlayer) {
-    chunk.colorPlayer.tint = bg;
-  }
+  const rect =spritePoolManager.get();
+  // rect.x = colonna * cellSize;
+  // rect.y = riga * cellSize;
+  rect.x =
+    colRelative * cellSize +
+    chunkCols * size * cellSize;
+  rect.y =
+    rowRelative * cellSize + chunkRows * size * cellSize;
+  rect.width = width;
+  rect.height = height;
+  rect.tint = color ?? '#000000';
+  rect.alpha = 0.7;
+  rect.zIndex = 0;
+  //rect.visible = true;
+  chunkReder.addChild(rect);
+  return  rect;
 };
