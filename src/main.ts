@@ -1,4 +1,4 @@
-import { Application, Renderer, Ticker } from 'pixi.js';
+import { Application, Renderer, Sprite, Texture, Ticker } from 'pixi.js';
 import { GameMap } from './scenes/game';
 import { SpritePool } from './utility/sprite-pool-manager';
 
@@ -34,7 +34,6 @@ export const configMap={
 }
 
 export const pool={
-      maxSprite:1000,
       controlTick:100
     }
 
@@ -46,8 +45,18 @@ const configApp = {
 (async () => {
   let dirtyChunks = new Map<string, DirtyChunk>();
   let spritePoolManager = SpritePool.getInstance();
-  spritePoolManager.init(pool.maxSprite)
-
+  spritePoolManager.init([
+    {
+      key: "colorSprite",
+      maxObject: 500,
+      factory: () => new Sprite(Texture.WHITE),
+      reset: (s) => {
+        s.visible = false;
+        s.alpha = 1;
+        s.tint = 0xffffff;
+      },
+    },
+  ]);
   const rowCunkInit:number=0
   const colCunkInit:number=0
 
@@ -103,8 +112,7 @@ const configApp = {
         // console.log(spritePoolManager.debug())
       }
       if(ntick%pool.controlTick===0){
-        spritePoolManager.controlMaxPool()
-         //console.log(ntick)
+        spritePoolManager.controlEveryPool()
       }
     });
 

@@ -109,7 +109,7 @@ export const reuseColorSprite = (
   color: string | undefined,
   chunkReder: Container<ContainerChild>,
 ) => {
-  const rect =spritePoolManager.get();
+  const rect =spritePoolManager.get('colorSprite');
   // rect.x = colonna * cellSize;
   // rect.y = riga * cellSize;
   rect.x =

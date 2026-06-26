@@ -40,7 +40,7 @@ export class Chunk {
 
   private allNullSprite() {
     this.activeSpriteColor.forEach((activeSprite)=>{
-      this.spritePoolManager.release(activeSprite)
+      this.spritePoolManager.release('colorSprite',activeSprite)
     })
      this.activeSpriteColor=[]
   }
