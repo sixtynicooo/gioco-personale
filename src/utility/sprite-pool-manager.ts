@@ -42,41 +42,41 @@ export class SpritePool {
   private constructor() {
   }
 
-get<K extends PoolKey>(key: K): PoolMap[K] {
-  const pool = this.pools[key];
-  if (!pool) throw new Error(`Pool "${key}" non inizializzato`);
+  get<K extends PoolKey>(key: K): PoolMap[K] {
+    const pool = this.pools[key];
+    if (!pool) throw new Error(`Pool "${key}" non inizializzato`);
 
-  const obj = pool.free.pop() ?? pool.factory();
-  pool.reset(obj);
-  pool.active.add(obj);
-  obj.visible = true;
-  return obj;
-}
-
-release<K extends PoolKey>(key: K, obj: PoolMap[K]) {
-  const pool = this.pools[key];
-  if (!pool || !pool.active.has(obj)) return;
-  pool.active.delete(obj);
-  pool.reset(obj);
-  obj.visible = false;
-  pool.free.push(obj);
-}
-
-init(configs: PoolConfigItem<PoolKey>[]) {
-  for (const cfg of configs) {
-    if (!this.pools[cfg.key]) {
-      this.pools[cfg.key] = {
-        free: [],
-        active: new Set(),
-        maxObject: cfg.maxObject,
-        factory: cfg.factory,
-        reset: cfg.reset,
-      };
-    }
-
-    this.prewarm(cfg.key);
+    const obj = pool.free.pop() ?? pool.factory();
+    pool.reset(obj);
+    pool.active.add(obj);
+    obj.visible = true;
+    return obj;
   }
-}
+
+  release<K extends PoolKey>(key: K, obj: PoolMap[K]) {
+    const pool = this.pools[key];
+    if (!pool || !pool.active.has(obj)) return;
+    pool.active.delete(obj);
+    pool.reset(obj);
+    obj.visible = false;
+    pool.free.push(obj);
+  }
+
+  init(configs: PoolConfigItem<PoolKey>[]) {
+    for (const cfg of configs) {
+      if (!this.pools[cfg.key]) {
+        this.pools[cfg.key] = {
+          free: [],
+          active: new Set(),
+          maxObject: cfg.maxObject,
+          factory: cfg.factory,
+          reset: cfg.reset,
+        };
+      }
+
+      this.prewarm(cfg.key);
+    }
+  }
 
   private prewarm<K extends PoolKey>(key: K) {
     const pool = this.pools[key];
